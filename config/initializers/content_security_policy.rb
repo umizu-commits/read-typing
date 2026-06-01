@@ -14,14 +14,14 @@ Rails.application.configure do
      policy.style_src   :self, :unsafe_inline
      policy.connect_src :self
      policy.form_action :self
-#     # Specify URI for violation reports
-#     # policy.report_uri "/csp-violation-report-endpoint"
+  #     # Specify URI for violation reports
+  #     # policy.report_uri "/csp-violation-report-endpoint"
 end
-#
-#   # Generate session nonces for permitted importmap, inline scripts, and inline styles.
+   #
+   #   # Generate session nonces for permitted importmap, inline scripts, and inline styles.
    config.content_security_policy_nonce_generator = ->(request) { request.session.id.to_s }
-   config.content_security_policy_nonce_directives = %w(script-src)
-#
-#   # Report violations without enforcing the policy.
-#   # config.content_security_policy_report_only = true
+   config.content_security_policy_nonce_directives = %w[script-src]
+  #
+  #   # Report violations without enforcing the policy.
+  #   # config.content_security_policy_report_only = true
 end
