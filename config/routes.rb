@@ -18,4 +18,8 @@ Rails.application.routes.draw do
   get "/typing/histories", to: "typing_histories#index"
 
   post "/typing/results", to: "typing#save_result"
+
+  get "/terms", to: "static_pages#terms"
+
+  get "/privacy", to: "static_pages#privacy"
 end
