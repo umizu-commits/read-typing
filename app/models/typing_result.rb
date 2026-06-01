@@ -5,5 +5,5 @@ class TypingResult < ApplicationRecord
   validates :accuracy, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :miss_count, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :elapsed_time, presence: true, numericality: { greater_than_or_equal_to: 0 }
-  validates :article_text, presence: true
+  validates :article_text, presence: true, length: { maximum: 10_000 }
 end
