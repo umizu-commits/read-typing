@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["text", "input","hint","timer"]
+  static targets = ["text", "input","hint","timer", "typedWindow"]
 
   connect() {
     const text = sessionStorage.getItem("typing_text")
@@ -41,6 +41,9 @@ export default class extends Controller {
     // タイピング完了のフラグ
     this.isCompleted = false
 
+    // タイピング中の文字（入力ウィンドウに表示）
+    this.typedText = ""
+
     // タイマー用の状態
     this.timerId = null
     this.startTime = null
@@ -64,6 +67,14 @@ export default class extends Controller {
     // Enterキーを無効にする部分
     if (event.key === "Enter") {
       event.preventDefault()
+      return
+    }
+
+    // BackSpaceキーを無効にする
+    if (event.key === "Backspace") {
+      event.preventDefault()
+      this.typedText = this.typedText.slice(0, -1)
+      this.typedWindowTarget.textContent = this.typedText
       return
     }
 
@@ -107,6 +118,8 @@ export default class extends Controller {
       this.missCount++ // ミスをカウントする
       spans[this.currentIndex].className = "text-red-500"
     }
+    this.typedText += key // 入力されたキーをTypedTextに追記
+    this.typedWindowTarget.textContent = this.typedText // 入力ウィンドウに反映
   }
 
   // リセットボタンのイベントハンドラ
@@ -165,6 +178,12 @@ export default class extends Controller {
     this.hintTarget.classList.add("hidden")
   }
 
+
+  handleCompositionUpdate(event) {
+    // 変換中の文字に合わせて文字を表示する
+    this.typedWindowTarget.textContent = event.data
+  }
+
   // IMEの確定時に呼ばれる
   // handleKeydownは isComposing 中にスキップされるため、日本語入力の判定はこちらで処理する
   handleCompositionEnd(event) {
@@ -201,6 +220,7 @@ export default class extends Controller {
       }
     }
     this.inputTarget.value = "" // 1回の変換確定後にtextareaをクリアすることで、次の変換開始時にカーソルが先頭に戻る
+    this.typedWindowTarget.textContent = "" // 確定時にクリア
   }
 
   // タイマーを開始する

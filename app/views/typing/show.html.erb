@@ -1,17 +1,30 @@
 <div data-controller="typing" class="h-[calc(100vh-128px)] overflow-hidden py-3 -mr-5">
   <div class="grid h-full grid-cols-[1fr_320px] gap-6 overflow-hidden">
-    <%# テキスト表示エリア %>
-    <section class="relative overflow-hidden rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+    <section class="relative overflow-hidden rounded-xl border border-gray-200 bg-white p-5 shadow-sm flex flex-col gap-3">
+
+      <%#  入力ウィンドウ %>
+      <div class="rounded-lg border border-gray-200 bg-gray-50 p-3">
+        <div class="text-xs font-bold text-gray-500">
+          入力文字
+        </div>
+        <div
+          data-typing-target="typedWindow"
+          class="font-mono text-sm text-gray-900 whitespace-pre-wrap break-all min-h-[2rem]"
+        ></div>
+      </div>
+
+
+      <%# テキスト表示エリア %>
       <p
         data-typing-target="text"
-        class="h-full overflow-auto whitespace-pre-wrap break-words text-lg font-semibold leading-relaxed text-gray-800 cursor-text"
+        class="flex-1 overflow-auto whitespace-pre-wrap break-words text-lg font-semibold leading-relaxed text-gray-800 cursor-text"
         data-action="click->typing#focusInput"
       >
       </p>
 
       <textarea
         data-typing-target="input"
-        data-action="keydown->typing#handleKeydown compositionstart->typing#handleCompositionStart compositionend->typing#handleCompositionEnd"
+        data-action="keydown->typing#handleKeydown compositionstart->typing#handleCompositionStart compositionupdate->typing#handleCompositionUpdate compositionend->typing#handleCompositionEnd"
         class="fixed opacity-0 w-full h-px overflow-hidden resize-none"
         autocomplete="off"
         spellcheck="false"></textarea>
