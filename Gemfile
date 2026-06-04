@@ -73,3 +73,8 @@ group :development, :test do
   gem "factory_bot_rails"
   gem "faker"
 end
+
+group :development do
+  gem "web-console"
+  gem "letter_opener_web"
+end
