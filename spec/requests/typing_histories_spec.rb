@@ -7,7 +7,7 @@ RSpec.describe "タイピング履歴", type: :request do
     context "未ログインの場合" do
       it "トップページにリダイレクトされる" do
         get typing_histories_path
-        expect(response).to redirect_to(root_path)
+        expect(response).to redirect_to(new_user_session_path)
       end
     end
 
