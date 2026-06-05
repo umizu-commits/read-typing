@@ -83,11 +83,11 @@ Rails.application.configure do
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.smtp_settings = {
     address: "smtp.resend.com",
-    port: 587,
+    port: 465,
     authentication: :plain,
     user_name: "resend",
     password: ENV["RESEND_API_KEY"],
-    enable_starttls_auto: true
+    tls: true,
   }
   config.action_mailer.default_url_options = {
     host: ENV["RENDER_EXTERNAL_HOSTNAME"],
