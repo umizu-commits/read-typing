@@ -58,6 +58,8 @@ end
 
 gem "devise", "~> 5.0"
 
+gem "resend"
+
 gem "pundit", "~> 2.5"
 
 gem "rspec-rails", "~> 8.0", groups: [ :development, :test ]

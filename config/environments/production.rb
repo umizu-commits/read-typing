@@ -78,19 +78,11 @@ Rails.application.configure do
   # caching is enabled.
   config.action_mailer.perform_caching = false
 
-  # Resend SMTP setting
-  config.action_mailer.delivery_method = :smtp
+  # Resend API setting
+  config.action_mailer.delivery_method = :resend
   config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.smtp_settings = {
-    address: "smtp.resend.com",
-    port: 465,
-    authentication: :plain,
-    user_name: "resend",
-    password: ENV["RESEND_API_KEY"],
-    tls: true,
-  }
   config.action_mailer.default_url_options = {
-    host: ENV["RENDER_EXTERNAL_HOSTNAME"],
+    host: ENV["RENDER_EXTERNAL_HOSTNAME"], 
     protocol: "https"
   }
 
