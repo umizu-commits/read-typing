@@ -1,5 +1,12 @@
-<p>Welcome <%= @email %>!</p>
+<p>このメールはReadTypingから自動で送信しています。<br>
+--------------------------------------------------------------<br>
+<br>
+ReadTypingをご利用いただきありがとうございます。<br>
+以下のリンクにアクセスすると、メールアドレスの確認が完了します。</p>
 
-<p>You can confirm your account email through the link below:</p>
+<p><%= link_to 'メールアドレスを確認する', confirmation_url(@resource, confirmation_token: @token) %></p>
 
-<p><%= link_to 'Confirm my account', confirmation_url(@resource, confirmation_token: @token) %></p>
+<p>このメールにお心当たりがない場合は、恐れ入りますが、このメールを削除してください。</p>
+
+<p>このメールアドレスには返信できません。</p>
+
