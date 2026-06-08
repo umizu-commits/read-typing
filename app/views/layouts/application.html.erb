@@ -59,6 +59,9 @@
         <%# モーダルヘッダー %>
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-xl font-bold text-gray-800">使い方</h2>
+          <button type="button" data-action="click->help#close" class="text-gray-400 hover:text-gray-600">
+            ✕
+          </button>
         </div>
 
         <%# ステップ %>
@@ -86,6 +89,34 @@
             <p>ログイン時は履歴一覧を確認することができます。また、履歴一覧画面ではこれまでの練習の平均記録を確認することができます。</p>
           </li>
         </ol>
+
+        <%# FAQ %>
+        <div class="border-t border-gray-200 pt-4 mb-6">
+          <h3 class="text-sm font-bold text-gray-700 mb-3">よくある質問</h3>
+          <div class="space-y-3">
+
+            <div> 
+              <p class="text-sm font-bold text-gray-700">Q. ログインしなくても使えますか？</p>
+              <p class="text-sm text-gray-600 mt-1">A. 使えます。ただし、ログインしていない場合はタイピング結果が保存されません。結果を履歴として残したい場合はログインしてください。</p>
+            </div>
+
+            <div>
+              <p class="text-sm font-bold text-gray-700">Q. どんな記事でも使えますか？</p>
+              <p class="text-sm text-gray-600 mt-1">A. テキストとして貼り付けられる内容であれば使用できます。</p>
+            </div>
+
+            <div>
+              <p class="text-sm font-bold text-gray-700">Q. URLを入力するだけで記事を取得できますか？</p>
+              <p class="text-sm text-gray-600 mt-1">A. 現在はテキストの貼り付けのみ対応しています。URL入力機能は今後実装予定です。</p>
+            </div>
+
+            <div>
+              <p class="text-sm font-bold text-gray-700">Q. スマートフォンでも使えますか？</p>
+              <p class="text-sm text-gray-600 mt-1">A. 現在はPC環境での利用を推奨しています。スマートフォンでは正しく表示されない場合があります。</p>
+            </div>
+
+          </div>
+        </div>
         
         <%# 注意事項 %>
         <div class="border-t border-gray-200 pt-4 mb-6">
