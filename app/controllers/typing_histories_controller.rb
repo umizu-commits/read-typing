@@ -5,6 +5,6 @@ class TypingHistoriesController < ApplicationController
     # 現在のユーザーの結果だけを返す
     @all_typing_results = policy_scope(TypingResult)
     # ページネーション適用（テーブル表示用）
-    @typing_results = @all_typing_results.order(created_at: :desc).page(params[:page]).per(10)
+    @typing_results = @all_typing_results.recent.page(params[:page]).per(10)
   end
 end

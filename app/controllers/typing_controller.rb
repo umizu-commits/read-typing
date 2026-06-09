@@ -13,14 +13,7 @@ class TypingController < ApplicationController
             return
         end
 
-        # ログイン中ならDBに保存する
-        result = current_user.typing_results.create(
-            wpm: params[:wpm],
-            accuracy: params[:accuracy],
-            miss_count: params[:miss_count],
-            elapsed_time: params[:elapsed_time],
-            article_text: params[:article_text]
-        )
+        result = current_user.typing_results.create(typing_result_params)
 
         # 保存結果に応じてレスポンスを返す
         if result.persisted?
@@ -28,5 +21,10 @@ class TypingController < ApplicationController
         else
             render json: { status: "failed" }
         end
+    end
+
+    private
+    def typing_result_params
+        params.permit(:wpm, :accuracy, :miss_count, :elapsed_time, :article_text)
     end
 end
