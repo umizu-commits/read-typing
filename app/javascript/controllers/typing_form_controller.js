@@ -18,8 +18,8 @@ submit(event) {
     return
     }
 
-    if (text.length > 3000) {
-    this.showError("3000文字以内のテキストを入力してください")
+    if (text.length > 10000) {
+    this.showError("10,000文字以内のテキストを入力してください")
     return
     }
 
