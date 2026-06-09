@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["text", "input","hint","timer", "typedWindow"]
+  static targets = ["text", "input","hint" ,"timer", "typedWindow", "progressBar", "progressText", "totalText"]
 
   connect() {
     const text = sessionStorage.getItem("typing_text")
@@ -12,6 +12,7 @@ export default class extends Controller {
     }
 
     this.chars = [...text] // handleInput() の中でも元のテキストを参照できるよう、this.chars に保存
+    this.totalTextTarget.textContent = this.chars.length
     this.inputTarget.focus() // ページ表示と同時にフォーカスを当てる
 
     // 1文字ずつ span に変換して表示する
@@ -141,6 +142,7 @@ export default class extends Controller {
     this.updateCursor()
     this.hintTarget.classList.remove("hidden")
     this.inputTarget.focus()
+    this.updateProgress()
   }
 
   // 現在の入力位置がスペースや改行の場合、入力済み扱いにして次の文字へ進める
@@ -160,6 +162,7 @@ export default class extends Controller {
 
   // 現在地にカーソルを表示する
   updateCursor() {
+    this.updateProgress()
     if (this.currentIndex >= this.chars.length) return // タイピング完了後はカーソルを表示しない
     const spans = this.textTarget.querySelectorAll("span")
     spans[this.currentIndex].className = "cursor-blink"
@@ -312,4 +315,13 @@ export default class extends Controller {
     this.saveResult("ended")
     window.location.href = "/typing/result"
   }
+
+  // 進捗
+  updateProgress(){
+    const total = this.chars.length
+    if (total === 0) return
+    const percent = Math.round((this.currentIndex / total) * 100)
+    this.progressBarTarget.style.width = `${percent}%`
+    this.progressTextTarget.textContent = this.currentIndex
+  } 
 }

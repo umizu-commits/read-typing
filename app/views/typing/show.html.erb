@@ -54,6 +54,22 @@
         </div>
       </div>
 
+      <%# 進捗 %>
+      <div class="w-[290px] rounded-xl bg-white p-5 shadow-sm">
+        <div class="flex justify-between text-xs font-bold text-gray-500 mb-2">
+          <span>進捗</span>
+          <span>
+            <span data-typing-target="progressText">0</span>/
+            <span data-typing-target="totalText">0</span>文字
+          </span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div data-typing-target="progressBar"
+               class="bg-blue-400 h-2 rounded-full transition-all duration-150"
+               style="width: 0%"></div>
+        </div>
+      </div>
+
       <%# 下グループ: ボタン2つ %>
       <div class="flex flex-col gap-2">
         <button
