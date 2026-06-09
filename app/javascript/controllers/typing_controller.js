@@ -111,7 +111,7 @@ export default class extends Controller {
       if (this.currentIndex >= this.chars.length) {
         this.isCompleted = true // タイピング完了のフラグを立てる
         this.stopTimer()
-        this.saveResult()
+        this.saveResult("completed")
         window.location.href = "/typing/result" // 完了時に自動で結果画面へ遷移する
       }
     } else {
@@ -211,7 +211,7 @@ export default class extends Controller {
         if (this.currentIndex >= this.chars.length) {
           this.isCompleted = true
           this.stopTimer()
-          this.saveResult()
+          this.saveResult("completed")
           window.location.href = "/typing/result"
         }
       } else {
@@ -292,14 +292,15 @@ export default class extends Controller {
   }
 
   // 完了時に結果をsessionStorageへ保存する
-  saveResult() {
+  saveResult(reason) {
     const result = {
       correctCount: this.correctCount,
       missCount: this.missCount,
       elapsedSeconds: this.elapsedSeconds,
       accuracy: this.calculateAccuracy(),
       cpm: this.calculateCpm(),
-      wpm: this.calculateWpm()
+      wpm: this.calculateWpm(),
+      reason: reason
     }
     sessionStorage.setItem("typing_result", JSON.stringify(result))
     sessionStorage.setItem("result_from_typing", "true")
@@ -308,7 +309,7 @@ export default class extends Controller {
   // 途中で終了しても結果画面へ
   endPractice() {
     this.stopTimer()
-    this.saveResult()
+    this.saveResult("ended")
     window.location.href = "/typing/result"
   }
 }

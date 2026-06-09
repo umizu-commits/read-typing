@@ -1,10 +1,16 @@
 <div data-controller="result" class="py-10 px-4">
 
-  <%# 完了メッセージ %>
-  <div class="text-center mb-8">
+  <%# 通常完了メッセージ（デフォルト表示） %>
+  <div data-result-target="completedMessage" class="text-center mb-8">
     <div class="text-6xl mb-4">🏆</div>
     <h1 class="text-3xl font-bold text-gray-800 mb-2">練習完了！お疲れ様でした。</h1>
     <p class="text-sm text-gray-500">タイピングを最後まで完了しました。</p>
+  </div>
+
+  <%# 途中終了メッセージ（hidden） %>
+  <div data-result-target="endedMessage" class="hidden text-center mb-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-2">お疲れ様でした。</h1>
+    <p class="text-sm text-gray-500">タイピングを途中で終了しました。</p>
   </div>
 
   <%# 保存成功 %>
@@ -15,6 +21,16 @@
   <%# 保存失敗 %>
   <div data-result-target="saveFailed" class="hidden max-w-2xl mx-auto rounded-xl bg-red-50 border border-red-200 p-4 text-center text-sm text-red-700 mb-6">
     結果の保存に失敗しました
+  </div>
+
+  <%# 「この記録を保存する」ボタン（途中終了 + ログイン時に表示） %>
+  <div data-result-target="saveButton" class="hidden flex flex-col items-center mb-6 gap-2">
+    <p class="text-sm text-gray-500 mb-3">
+      この記録はまだ保存されていません。
+    </p>
+    <button type="button" data-action="click->result#saveManually" class="rounded-lg bg-blue-400 px-6 py-3 font-bold text-white text-sm hover:bg-blue-500">
+      この記録を保存する
+    </button>
   </div>
 
   <%# 結果スタッツ %>

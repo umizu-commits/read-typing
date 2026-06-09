@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-    static targets = ["accuracy", "cpm", "wpm", "missCount", "elapsedTime", "saveSuccess", "saveFailed", "saveSkipped"]
+    static targets = ["accuracy", "cpm", "wpm", "missCount", "elapsedTime", "saveSuccess", "saveFailed", "saveSkipped", "saveButton", "completedMessage", "endedMessage"]
 
     connect() {
         const raw = sessionStorage.getItem("typing_result")
@@ -32,7 +32,54 @@ export default class extends Controller {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content
         const articleText = sessionStorage.getItem("typing_text")
 
-        // fetchのPOST送信
+        // reasonによって分岐
+        if (result.reason === "completed") {
+            // 通常完了時は自動保存
+            fetch("/typing/results", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-Token": csrfToken
+                },
+                body: JSON.stringify({ wpm: result.wpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText })
+            })
+            // レスポンスの処理
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "saved") {
+                    this.saveSuccessTarget.classList.remove("hidden")
+                } else if (data.status === "skipped") {
+                    this.saveSkippedTarget.classList.remove("hidden")
+                } else {
+                    this.saveFailedTarget.classList.remove("hidden")
+                }
+            })
+
+        } else if (result.reason === "ended") {
+            // 途中終了時は保存ボタンを表示してユーザーの判断に委ねる
+            const isLoggedIn = document.querySelector('meta[name="user-signed-in"]')?.content === "true"
+            
+            if (isLoggedIn) {
+              this.saveButtonTarget.classList.remove("hidden") // 保存ボタンを表示
+            }
+            // 未ログインはスコープ外のため、保存せずにスキップ扱いとする  
+            this.completedMessageTarget.classList.add("hidden")
+            this.endedMessageTarget.classList.remove("hidden")
+        }
+    }
+
+    formatTime(seconds) {
+        const m = Math.floor(seconds / 60).toString().padStart(2, "0")
+        const s = (seconds % 60).toString().padStart(2, "0")
+        return `${m}:${s}`
+    }
+
+    // 途中終了時に保存するかの選択で「保存する」を選んだ場合の処理
+    saveManually() {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content
+        const articleText = sessionStorage.getItem("typing_text")
+        const result = JSON.parse(sessionStorage.getItem("typing_result"))
+
         fetch("/typing/results", {
             method: "POST",
             headers: {
@@ -41,24 +88,15 @@ export default class extends Controller {
             },
             body: JSON.stringify({ wpm: result.wpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText })
         })
-
-        // レスポンスの処理
         .then(res => res.json())
         .then(data => {
             if (data.status === "saved") {
                 this.saveSuccessTarget.classList.remove("hidden")
-            } else if (data.status === "skipped") {
-                this.saveSkippedTarget.classList.remove("hidden")
+                this.saveButtonTarget.classList.add("hidden")
             } else {
                 this.saveFailedTarget.classList.remove("hidden")
             }
         })
-    }
-
-    formatTime(seconds) {
-        const m = Math.floor(seconds / 60).toString().padStart(2, "0")
-        const s = (seconds % 60).toString().padStart(2, "0")
-        return `${m}:${s}`
     }
 
     // sessionStorageの削除を行ってから、TOPページに遷移する

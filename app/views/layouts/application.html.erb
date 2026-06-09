@@ -3,6 +3,7 @@
   <head>
     <title><%= content_for(:title) || "ReadTyping" %></title>
     <meta name="viewport" content="width=1280">
+    <meta name="user-signed-in" content="<%= user_signed_in? %>">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
