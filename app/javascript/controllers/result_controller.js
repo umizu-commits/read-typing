@@ -41,7 +41,7 @@ export default class extends Controller {
                     "Content-Type": "application/json",
                     "X-CSRF-Token": csrfToken
                 },
-                body: JSON.stringify({ wpm: result.wpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText })
+                body: JSON.stringify({ wpm: result.wpm, cpm: result.cpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText })
             })
             // レスポンスの処理
             .then(res => res.json())
@@ -86,7 +86,7 @@ export default class extends Controller {
                 "Content-Type": "application/json",
                 "X-CSRF-Token": csrfToken
             },
-            body: JSON.stringify({ wpm: result.wpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText })
+            body: JSON.stringify({ wpm: result.wpm, cpm: result.cpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText })
         })
         .then(res => res.json())
         .then(data => {

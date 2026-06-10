@@ -10,13 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_10_060523) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_10_082100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "typing_results", force: :cascade do |t|
     t.float "accuracy"
     t.text "article_text"
+    t.float "cpm"
     t.datetime "created_at", null: false
     t.integer "elapsed_time"
     t.integer "miss_count"
