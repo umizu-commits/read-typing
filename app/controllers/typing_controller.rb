@@ -9,6 +9,7 @@ class TypingController < ApplicationController
     def save_result
         # 未ログインならスキップ
         unless user_signed_in?
+            session[:pending_typing_result] = typing_result_params.to_h
             render json: { status: "skipped" }
             return
         end
