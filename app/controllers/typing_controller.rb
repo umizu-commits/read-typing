@@ -25,6 +25,6 @@ class TypingController < ApplicationController
 
     private
     def typing_result_params
-        params.permit(:wpm, :accuracy, :miss_count, :elapsed_time, :article_text)
+        params.permit(:wpm, :cpm, :accuracy, :miss_count, :elapsed_time, :article_text)
     end
 end
