@@ -36,15 +36,27 @@
 
       <form data-action="submit->typing-form#submit">
         <textarea data-typing-form-target="text"
+                  data-action="input->typing-form#toggleClearButton"
                   placeholder="ここに技術記事の内容をペーストしてください..."
                   rows="10"
                   class="w-full border border-gray-200 rounded-lg p-4 text-sm resize-none
   focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
 
-          <%# 文字数上限の説明 %>
-          <p class="text-xs text-gray-400 mt-1 text-right">
-          最大10,000文字
-          </p>
+          <div class="flex justify-between items-center mt-1">
+            <%# テキストクリアボタン %>
+            <button type="button"
+                    data-action="click->typing-form#clear"
+                    data-typing-form-target="clearButton"
+                    disabled
+                    class="text-xs text-gray-400 hover:text-blue-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+              テキストをクリア
+            </button>
+
+            <%# 文字数上限の説明 %>
+            <p class="text-xs text-gray-400 mt-1 text-right">
+            最大10,000文字
+            </p>
+          </div>
 
         <button type="submit"
                 class="w-full bg-blue-400 hover:bg-blue-500 text-white font-bold py-3 rounded-lg mt-4
