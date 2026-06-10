@@ -5,6 +5,7 @@ RSpec.describe "タイピング結果保存", type: :request do
   let(:valid_params) do
     {
       wpm: 60.0,
+      cpm: 300.0,
       accuracy: 95.0,
       miss_count: 3,
       elapsed_time: 120,
