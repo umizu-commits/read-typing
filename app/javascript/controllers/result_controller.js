@@ -29,30 +29,18 @@ export default class extends Controller {
         this.missCountTarget.textContent = result.missCount
         this.elapsedTimeTarget.textContent = this.formatTime(result.elapsedSeconds)
 
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content
         const articleText = sessionStorage.getItem("typing_text")
 
-        // reasonによって分岐
         if (result.reason === "completed") {
-            // 通常完了時は自動保存
-            fetch("/typing/results", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-Token": csrfToken
-                },
-                body: JSON.stringify({ wpm: result.wpm, cpm: result.cpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText })
-            })
-            // レスポンスの処理
-            .then(res => res.json())
-            .then(data => {
+            const body = { wpm: result.wpm, cpm: result.cpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText }
+            this.postResult(body, (data) => {
                 if (data.status === "saved") {
                     this.saveSuccessTarget.classList.remove("hidden")
                 } else if (data.status === "skipped") {
                     this.saveSkippedTarget.classList.remove("hidden")
                 } else {
                     this.saveFailedTarget.classList.remove("hidden")
-                }
+                } 
             })
 
         } else if (result.reason === "ended") {
@@ -68,6 +56,23 @@ export default class extends Controller {
         }
     }
 
+    postResult(body, onSuccess) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content
+        fetch("/typing/results", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-Token": csrfToken
+            },
+            body: JSON.stringify(body)
+        })
+        .then(res => res.json())
+        .then(data => onSuccess(data))
+        .catch(() => {
+            this.saveFailedTarget.classList.remove("hidden")
+        })
+    }
+
     formatTime(seconds) {
         const m = Math.floor(seconds / 60).toString().padStart(2, "0")
         const s = (seconds % 60).toString().padStart(2, "0")
@@ -76,20 +81,10 @@ export default class extends Controller {
 
     // 途中終了時に保存するかの選択で「保存する」を選んだ場合の処理
     saveManually() {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content
         const articleText = sessionStorage.getItem("typing_text")
         const result = JSON.parse(sessionStorage.getItem("typing_result"))
-
-        fetch("/typing/results", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-Token": csrfToken
-            },
-            body: JSON.stringify({ wpm: result.wpm, cpm: result.cpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText })
-        })
-        .then(res => res.json())
-        .then(data => {
+        const body = { wpm: result.wpm, cpm: result.cpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText }
+        this.postResult(body, (data) => {
             if (data.status === "saved") {
                 this.saveSuccessTarget.classList.remove("hidden")
                 this.saveButtonTarget.classList.add("hidden")
