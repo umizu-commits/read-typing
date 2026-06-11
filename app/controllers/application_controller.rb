@@ -10,11 +10,13 @@ class ApplicationController < ActionController::Base
 
   # 登録後のリダイレクトページを明示する
   def after_sign_up_path_for(resource)
+    save_pending_typing_result(resource)
     root_path
   end
 
   # ログイン後のリダイレクトページを明示する
   def after_sign_in_path_for(resource)
+    save_pending_typing_result(resource)
     root_path
   end
 
@@ -28,5 +30,11 @@ class ApplicationController < ActionController::Base
   def user_not_authorized
     flash[:alert] = "このページへのアクセス権限がありません。"
     redirect_to root_path
+  end
+
+  def save_pending_typing_result(user)
+    pending = session.delete(:pending_typing_result)
+    return unless pending
+    user.typing_results.create(pending)
   end
 end
