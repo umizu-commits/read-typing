@@ -59,6 +59,9 @@ end
 
 gem "devise", "~> 5.0"
 
+gem "omniauth-github"
+gem "omniauth-rails_csrf_protection"
+
 gem "resend"
 
 gem "pundit", "~> 2.5"

@@ -29,6 +29,19 @@
           class: "w-full mt-6 rounded-lg bg-blue-400 px-6 py-3 font-bold text-white shadow-sm hover:bg-blue-500 cursor-pointer" %>
     <% end %>
 
+    <div class="relative flex items-center">
+      <div class="flex-grow border-t border-gray-200"></div>
+      <span class="mx-3 text-xs text-gray-400">または</span>
+      <div class="flex-grow border-t border-gray-200"></div>
+    </div>
+
+    <%= button_to user_github_omniauth_authorize_path,
+        method: :post,
+        form: { data: { turbo: false } },
+        class: "flex items-center justify-center gap-2 w-full rounded-lg border border-gray-300 px-6 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50" do %>
+      GitHubでログイン
+    <% end %>
+
     <div class="flex flex-col gap-2 items-center text-sm text-gray-500">
       <div>
         アカウントをお持ちでない方は
