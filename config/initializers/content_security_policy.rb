@@ -13,7 +13,7 @@ Rails.application.configure do
      policy.script_src  :self
      policy.style_src   :self, :unsafe_inline
      policy.connect_src :self
-     policy.form_action :self
+     policy.form_action :self, "https://github.com"
   #     # Specify URI for violation reports
   #     # policy.report_uri "/csp-violation-report-endpoint"
 end
