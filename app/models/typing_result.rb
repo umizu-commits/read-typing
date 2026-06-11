@@ -1,5 +1,6 @@
 class TypingResult < ApplicationRecord
   belongs_to :user
+  belongs_to :article, optional: true
 
   validates :wpm, presence: true, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 400 } # 人間の限界WPMを大幅に超える値を弾く
   validates :cpm, presence: true, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 2000 } # 人間の限界CPMを大幅に超える値を弾く（WPM世界記録は300前後）
