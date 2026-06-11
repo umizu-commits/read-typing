@@ -49,8 +49,14 @@ export default class extends Controller {
             
             if (isLoggedIn) {
               this.saveButtonTarget.classList.remove("hidden") // 保存ボタンを表示
+            } else {
+                const body = { wpm: result.wpm, cpm: result.cpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText }
+                this.postResult(body, (data) => {
+                    if (data.status === "skipped") {
+                        this.saveSkippedTarget.classList.remove("hidden")
+                    }
+                })
             }
-            // 未ログインはスコープ外のため、保存せずにスキップ扱いとする  
             this.completedMessageTarget.classList.add("hidden")
             this.endedMessageTarget.classList.remove("hidden")
         }
@@ -84,14 +90,15 @@ export default class extends Controller {
         const articleText = sessionStorage.getItem("typing_text")
         const result = JSON.parse(sessionStorage.getItem("typing_result"))
         const body = { wpm: result.wpm, cpm: result.cpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText }
+
         this.postResult(body, (data) => {
             if (data.status === "saved") {
                 this.saveSuccessTarget.classList.remove("hidden")
                 this.saveButtonTarget.classList.add("hidden")
             } else {
                 this.saveFailedTarget.classList.remove("hidden")
-            }
-        })
+            }  
+        })  
     }
 
     // sessionStorageの削除を行ってから、TOPページに遷移する
