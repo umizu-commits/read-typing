@@ -44,10 +44,17 @@
       <div class="flex-grow border-t border-gray-200"></div>
     </div>
 
+    <%= button_to user_google_oauth2_omniauth_authorize_path,
+        method: :post,
+        form: { data: { turbo: false } },
+        class: "flex items-center justify-center gap-2 w-full rounded-lg border border-gray-300 px-6 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 cursor-pointer bg-white" do %>
+      Googleでログイン
+    <% end %>
+
     <%= button_to user_github_omniauth_authorize_path,
         method: :post,
         form: { data: { turbo: false } },
-        class: "flex items-center justify-center gap-2 w-full rounded-lg border border-gray-300 px-6 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50" do %>
+        class: "flex items-center justify-center gap-2 w-full rounded-lg border border-gray-300 px-6 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50 cursor-pointer bg-white" do %>
       GitHubでログイン
     <% end %>
 
