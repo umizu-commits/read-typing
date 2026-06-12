@@ -1,7 +1,7 @@
 class ArticlesController < ApplicationController
   def create
     url = params[:url]
-    
+
     if url.blank?
       redirect_to root_path, alert: "URLを入力してください"
       return
