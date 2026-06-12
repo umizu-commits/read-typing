@@ -7,40 +7,86 @@
         ReadTypingは、技術記事をタイピングしながら学習するためのプラットフォームです。<br>
         知識の習得とタイピング速度の向上を同時に実現します。
       </p>
-      <p class="text-gray-500 text-sm mt-2">
-        テキストを貼り付けるだけですぐに始められます。
-      </p>
     </div>
 
     <%# フォームカード %>
-    <div data-controller="typing-form" class="bg-white rounded-xl border border-gray-200 shadow-sm p-6
-   max-w-2xl mx-auto">
+    <div data-controller="typing-form url-form" class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 max-w-2xl mx-auto">
 
-      <div class="mb-4">
-        <h2 class="font-bold text-lg flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          記事をペーストして開始
-        </h2>
-        <p class="text-sm text-gray-500 mt-1">
-          学びたい技術ブログ、ドキュメントを以下のエリアに貼り付けてください。
-        </p>
+      <%# タブボタン %>
+      <div class="flex border-b border-gray-200 mb-6">
+        <button type="button"
+                data-url-form-target="urlTab"
+                data-action="click->url-form#showUrl"
+                class="px-4 py-2 text-sm font-bold border-b-2 border-blue-500 text-blue-600">
+          URLから取得
+        </button>
+        <button type="button"
+                data-url-form-target="textTab"
+                data-action="click->url-form#showText"
+                class="px-4 py-2 text-sm font-bold border-b-2 border-transparent text-gray-400">
+          テキストを貼り付け
+        </button>
       </div>
 
+      <%# URLフォームコンテンツ %>
+      <div data-url-form-target="urlContent">
+        <div class="mb-4">
+          <h2 class="font-bold text-lg flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+            </svg>
+            URLから記事を取得して開始
+          </h2>
+          <p class="text-sm text-gray-500 mt-1">
+            記事のURLを入力するだけで本文を自動取得します。
+          </p>
+        </div>
 
-      <div data-typing-form-target="error"
-           class="hidden mb-4 bg-red-50 border border-red-300 text-red-700 rounded-lg px-4 py-3
-  text-sm">
+        <div data-url-form-target="urlError"
+             class="hidden mb-4 bg-red-50 border border-red-300 text-red-700 rounded-lg px-4 py-3 text-sm">
+        </div>
+
+        <form action="/articles" method="post" data-action="submit->url-form#submitUrl">
+          <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+          <input type="url"
+                 name="url"
+                 data-url-form-target="urlInput"
+                 placeholder="https://example.com/article"
+                 class="w-full border border-gray-200 rounded-lg p-4 text-sm
+                        focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <button type="submit"
+                  class="w-full bg-blue-400 hover:bg-blue-500 text-white font-bold py-3 rounded-lg mt-4
+                         cursor-pointer transition-colors">
+            記事を取得してタイピング練習を開始する
+          </button>
+        </form>
       </div>
 
-      <form data-action="submit->typing-form#submit">
-        <textarea data-typing-form-target="text"
-                  data-action="input->typing-form#toggleClearButton"
-                  placeholder="ここに技術記事の内容をペーストしてください..."
-                  rows="10"
-                  class="w-full border border-gray-200 rounded-lg p-4 text-sm resize-none
-  focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+      <%# テキストフォームコンテンツ %>
+      <div data-url-form-target="textContent" class="hidden">
+        <div class="mb-4">
+          <h2 class="font-bold text-lg flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            記事をペーストして開始
+          </h2>
+          <p class="text-sm text-gray-500 mt-1">
+            テキストを以下のエリアに貼り付けてください。
+          </p>
+        </div>
+
+        <div data-typing-form-target="error"
+             class="hidden mb-4 bg-red-50 border border-red-300 text-red-700 rounded-lg px-4 py-3 text-sm">
+        </div>
+
+        <form data-action="submit->typing-form#submit">
+          <textarea data-typing-form-target="text"
+                    data-action="input->typing-form#toggleClearButton"
+                    placeholder="ここに技術記事の内容をペーストしてください..."
+                    rows="10"
+                    class="w-full border border-gray-200 rounded-lg p-4 text-sm resize-none
+                           focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
 
           <div class="flex justify-between items-center mt-1">
             <%# テキストクリアボタン %>
@@ -54,18 +100,19 @@
 
             <%# 文字数上限の説明 %>
             <p class="text-xs text-gray-400 mt-1 text-right">
-            最大10,000文字
+              最大10,000文字
             </p>
           </div>
 
-        <button type="submit"
-                class="w-full bg-blue-400 hover:bg-blue-500 text-white font-bold py-3 rounded-lg mt-4
-  cursor-pointer transition-colors">
-          タイピング練習を開始する
-        </button>
-      </form>
+          <button type="submit"
+                  class="w-full bg-blue-400 hover:bg-blue-500 text-white font-bold py-3 rounded-lg mt-4
+                         cursor-pointer transition-colors">
+            タイピング練習を開始する
+          </button>
+        </form>
+      </div>
 
-      <div class="flex justify-center gap-6 mt-4 text-sm text-gray-500">
+      <div class="flex justify-center gap-6 mt-6 text-sm text-gray-500">
         <span>✓ WPM計測</span>
         <span>✓ ミスカウント表示</span>
         <span>✓ ログイン不要ですぐ開始</span>
@@ -74,14 +121,13 @@
     </div>
 
     <%# フッター CTA %>
-          <% unless user_signed_in? %>
-    <div class="text-center mt-4">
-      <div class="inline-block bg-white border border-gray-200 rounded-lg px-6 py-2 text-sm
-  text-gray-600">
-        タイピング結果を保存して成長を記録しませんか？
-        <%= link_to "今すぐログイン・新規登録", new_user_session_path, class: "text-blue-600 font-bold ml-1" %>
+    <% unless user_signed_in? %>
+      <div class="text-center mt-4">
+        <div class="inline-block bg-white border border-gray-200 rounded-lg px-6 py-2 text-sm text-gray-600">
+          タイピング結果を保存して成長を記録しませんか？
+          <%= link_to "今すぐログイン・新規登録", new_user_session_path, class: "text-blue-600 font-bold ml-1" %>
+        </div>
       </div>
-    </div>
-  <% end %>
+    <% end %>
 
   </div>

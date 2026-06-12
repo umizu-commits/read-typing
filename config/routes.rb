@@ -14,15 +14,14 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
   get "/typing", to: "typing#show"
-
   get "/typing/result", to: "typing#result"
+  post "/typing/results", to: "typing#save_result"
 
   get "/typing/histories", to: "typing_histories#index"
 
-  post "/typing/results", to: "typing#save_result"
+  post "/articles", to: "articles#create"
 
   get "/terms", to: "static_pages#terms"
-
   get "/privacy", to: "static_pages#privacy"
 
   if Rails.env.development?
