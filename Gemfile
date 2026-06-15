@@ -80,3 +80,6 @@ group :development, :test do
   gem "factory_bot_rails"
   gem "faker"
 end
+
+gem "faraday"
+gem "faraday-follow_redirects"

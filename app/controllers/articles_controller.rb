@@ -18,6 +18,12 @@ class ArticlesController < ApplicationController
       return
     end
 
-    redirect_to root_path, notice: "URLを受け取りました: #{url}"
+    result = ArticleHtmlFetcher.new(url).call
+
+    if result.success?
+      redirect_to root_path, notice: "HTML を取得しました（#{result.html.length} 文字）"
+    else
+      redirect_to root_path, alert: result.error_message
+    end
   end
 end
