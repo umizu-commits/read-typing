@@ -3,7 +3,7 @@ class TypingTextPreprocessor
 
   # データベース（Article モデル）に保存する設計を実装するまで一時的にCookieで保存するための制限
   MAX_BODY_LENGTH = 500
-  
+
   Result = Struct.new(:success?, :body, :error_message, keyword_init: true)
 
   def initialize(text)
@@ -27,7 +27,7 @@ class TypingTextPreprocessor
 
     # 絵文字を除去
     text = text.gsub(/\p{Emoji_Presentation}/, "")
-    
+
     # 全角スペース→半角、タブ→スペース
     text = text.gsub("\u3000", " ")
     text = text.gsub("\t", " ")
