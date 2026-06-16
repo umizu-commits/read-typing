@@ -19,7 +19,7 @@ Rails.application.routes.draw do
 
   get "/typing/histories", to: "typing_histories#index"
 
-  post "/articles", to: "articles#create"
+  resources :articles, only: [ :index, :create, :destroy ]
 
   get "/terms", to: "static_pages#terms"
   get "/privacy", to: "static_pages#privacy"
