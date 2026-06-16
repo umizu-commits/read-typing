@@ -1,6 +1,25 @@
 class TypingController < ApplicationController
     def show
-      @typing_text = session.delete(:typing_text)
+      article = Article.find_by(id: params[:article_id])
+
+      if article.nil?
+        redirect_to root_path, alert: "タイピング対象の記事が見つかりません"
+        return
+      end
+
+      if user_signed_in?
+        unless article.user_id == current_user.id
+          redirect_to root_path, alert: "この記事にはアクセスできません"
+          return
+        end
+      else
+        unless article.user_id.nil?
+          redirect_to root_path, alert: "この記事にはアクセスできません"
+          return
+        end
+      end
+
+      @typing_text = article.body
     end
 
     def result

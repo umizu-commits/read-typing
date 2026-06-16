@@ -38,8 +38,16 @@ class ArticlesController < ApplicationController
       redirect_to root_path, alert: preprocess_result.error_message
       return
     end
-    # セッションに保存してタイピング画面へ
-    session[:typing_text] = preprocess_result.body
-    redirect_to typing_path
+
+    # DB保存（同URL同ユーザー時は既存を再利用 / レース時は find_by に fallback）
+    begin
+      article = Article.find_or_create_by!(url: url, user_id: current_user&.id) do |a|
+        a.body = preprocess_result.body
+      end
+    rescue ActiveRecord::RecordNotUnique
+      article = Article.find_by!(url: url, user_id: current_user&.id)
+    end
+
+    redirect_to typing_path(article_id: article.id)
   end
 end
