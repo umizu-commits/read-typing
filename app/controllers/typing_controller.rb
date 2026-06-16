@@ -1,5 +1,6 @@
 class TypingController < ApplicationController
     def show
+      @typing_text = session.delete(:typing_text)
     end
 
     def result

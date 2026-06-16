@@ -27,10 +27,19 @@ class ArticlesController < ApplicationController
 
     # 本文抽出
     extract_result = ArticleBodyExtractor.new(fetch_result.html).call
-    if extract_result.success?
-      redirect_to root_path, notice: "本文を抽出しました（#{extract_result.body.length} 文字）"
-    else
+    unless extract_result.success?
       redirect_to root_path, alert: extract_result.error_message
+      return
     end
+
+    # 前処理
+    preprocess_result = TypingTextPreprocessor.new(extract_result.body).call
+    unless preprocess_result.success?
+      redirect_to root_path, alert: preprocess_result.error_message
+      return
+    end
+    # セッションに保存してタイピング画面へ
+    session[:typing_text] = preprocess_result.body
+    redirect_to typing_path
   end
 end
