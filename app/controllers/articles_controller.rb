@@ -18,12 +18,19 @@ class ArticlesController < ApplicationController
       return
     end
 
-    result = ArticleHtmlFetcher.new(url).call
+    # HTML 取得
+    fetch_result = ArticleHtmlFetcher.new(url).call
+    unless fetch_result.success?
+      redirect_to root_path, alert: fetch_result.error_message
+      return
+    end
 
-    if result.success?
-      redirect_to root_path, notice: "HTML を取得しました（#{result.html.length} 文字）"
+    # 本文抽出
+    extract_result = ArticleBodyExtractor.new(fetch_result.html).call
+    if extract_result.success?
+      redirect_to root_path, notice: "本文を抽出しました（#{extract_result.body.length} 文字）"
     else
-      redirect_to root_path, alert: result.error_message
+      redirect_to root_path, alert: extract_result.error_message
     end
   end
 end
