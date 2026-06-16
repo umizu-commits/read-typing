@@ -475,6 +475,7 @@ DEPENDENCIES
   jbuilder
   kaminari
   letter_opener_web
+  nokogiri
   omniauth-github
   omniauth-google-oauth2
   omniauth-rails_csrf_protection

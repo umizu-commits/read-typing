@@ -83,3 +83,4 @@ end
 
 gem "faraday"
 gem "faraday-follow_redirects"
+gem "nokogiri"
