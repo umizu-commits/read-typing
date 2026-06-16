@@ -5,6 +5,8 @@ class ApplicationController < ActionController::Base
   # 認可エラー時に自動で呼ばれる処理を登録
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
+  rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
+  
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
 
@@ -30,6 +32,10 @@ class ApplicationController < ActionController::Base
   def user_not_authorized
     flash[:alert] = "このページへのアクセス権限がありません。"
     redirect_to root_path
+  end
+
+  def record_not_found
+    render file: Rails.root.join("public/404.html"), status: :not_found, layout: false
   end
 
   def save_pending_typing_result(user)

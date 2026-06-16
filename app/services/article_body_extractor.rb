@@ -6,7 +6,7 @@ class ArticleBodyExtractor
   CONTENT_SELECTORS = "p, h1, h2, h3, h4, h5, h6, li, blockquote".freeze
   MIN_BODY_LENGTH = 50
 
-  Result = Struct.new(:success?, :body, :error_message, keyword_init: true)
+  Result = Struct.new(:success?, :body, :title, :error_message, keyword_init: true)
 
   def initialize(html)
     @html = html
@@ -14,6 +14,7 @@ class ArticleBodyExtractor
 
   def call
     doc = Nokogiri::HTML(@html)
+    title = doc.at_css("title")&.text&.strip
     main_node = doc.at_css("article") || doc.at_css("main") || doc.at_css("body")
     return error_result("本文が見つかりませんでした") if main_node.nil?
 
@@ -33,13 +34,13 @@ class ArticleBodyExtractor
     return error_result("本文が見つかりませんでした") if body_text.empty?
     return error_result("本文が短すぎます") if body_text.length < MIN_BODY_LENGTH
 
-    success_result(body_text)
+    success_result(body_text, title)
   end
 
   private
 
-  def success_result(body)
-    Result.new(success?: true, body: body, error_message: nil)
+  def success_result(body, title)
+    Result.new(success?: true, body: body, title: title, error_message: nil)
   end
 
   def error_result(message)
