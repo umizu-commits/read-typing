@@ -1,5 +1,6 @@
 class TypingController < ApplicationController
     def show
+      return if params[:article_id].blank?
       article = Article.find_by(id: params[:article_id])
 
       if article.nil?
