@@ -4,6 +4,7 @@ class ArticleForm
   attr_accessor :url, :user
 
   validates :url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]), message: "は正しいURL形式で入力してください" }
+  validate :url_must_use_hostname
 
   def save
     return false unless valid?
@@ -39,5 +40,20 @@ class ArticleForm
 
   def article
     @article
+  end
+
+  private
+
+  def url_must_use_hostname
+    return if url.blank? # presence バリデーションに任せる
+    host = URI.parse(url).hostname
+    return if host.nil?
+
+    IPAddr.new(host) # 例外が出なければ IP リテラル → エラー
+    errors.add(:url, "にIPアドレスは使用できません")
+  rescue IPAddr::InvalidAddressError
+    nil # ドメイン名なので OK
+  rescue URI::InvalidURIError
+    nil # format バリデーションに任せる
   end
 end
