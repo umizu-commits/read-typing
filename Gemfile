@@ -75,6 +75,7 @@ gem "rubocop-rails", "~> 2.35", groups: [ :development, :test ]
 gem "tailwindcss-rails", "~> 4.4"
 
 gem "kaminari"
+gem "chartkick"
 
 group :development, :test do
   gem "factory_bot_rails"

@@ -10,9 +10,9 @@ Rails.application.configure do
      policy.font_src    :self
      policy.img_src     :self, :data
      policy.object_src  :none
-     policy.script_src  :self
+     policy.script_src  :self, "https://cdn.jsdelivr.net"
      policy.style_src   :self, :unsafe_inline
-     policy.connect_src :self
+     policy.connect_src :self, "https://cdn.jsdelivr.net"
      policy.form_action :self, "https://github.com", "https://accounts.google.com"
   #     # Specify URI for violation reports
   #     # policy.report_uri "/csp-violation-report-endpoint"
