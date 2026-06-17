@@ -100,6 +100,6 @@ RSpec.describe ArticleHtmlFetcher do
     it "エラー結果を返す" do
       expect(result.success?).to be false
       expect(result.error_message).to eq("応答が遅すぎます")
-    end   
+    end
   end
 end

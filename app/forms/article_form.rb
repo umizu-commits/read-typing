@@ -54,6 +54,6 @@ class ArticleForm
   rescue IPAddr::InvalidAddressError
     nil # ドメイン名なので OK
   rescue URI::InvalidURIError
-    nil # format バリデーションに任せる 
+    nil # format バリデーションに任せる
   end
 end

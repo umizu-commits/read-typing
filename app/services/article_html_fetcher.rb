@@ -13,7 +13,7 @@ class ArticleHtmlFetcher
 
   def call
     buffer = +""  # ミュータブルな空文字列（+ はフリーズしない文字列を作る）
-    
+
     response = SsrfFilter.get(
       @url,
       headers: { "User-Agent" => USER_AGENT },

@@ -20,7 +20,7 @@ RSpec.describe ArticleForm do
         expect(form.errors[:url]).to include("にIPアドレスは使用できません")
       end
     end
-  
+
     context "IPv6リテラルのURLの場合" do
       let(:url) { "http://[::1]/" }
 
