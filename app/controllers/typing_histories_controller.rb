@@ -25,4 +25,14 @@ class TypingHistoriesController < ApplicationController
       render :show, status: :unprocessable_entity
     end
   end
+
+  def chart_data
+    authorize TypingResult, :index?
+    results = policy_scope(TypingResult).order(created_at: :asc).limit(30)
+
+    render json: [
+      { name: "WPM", data: results.map { |r| [ r.created_at.strftime("%m月%d日 %H:%M"), r.wpm ] } },
+      { name: "CPM", data: results.map { |r| [ r.created_at.strftime("%m月%d日 %H:%M"), r.cpm ] } }
+    ]
+  end
 end

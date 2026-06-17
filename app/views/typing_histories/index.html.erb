@@ -100,6 +100,41 @@
     </div>
   <% end %>
 
+  <%# WPM・CPM推移グラフ %>
+  <% if @all_typing_results.any? %>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5 mb-4">
+      <div class="flex items-center gap-2 mb-4">
+        <div class="text-xs font-bold text-gray-500">WPM・CPM 推移グラフ</div>
+        <div class="text-xs text-gray-400">（直近30件）</div>
+      </div>
+      <%= line_chart chart_data_typing_histories_path(format: :json),
+            height: "300px",
+            colors: ["#3b82f6", "#60a5fa"],
+            curve: false,
+            points: true,
+            legend: "bottom",
+            library: {
+              devicePixelRatio: 2,
+              scales: {
+                x: {
+                  ticks: {
+                    maxTicksLimit: 8,
+                    maxRotation: 30,
+                    minRotation: 30,
+                    font: { size: 12 }
+                  }
+                },
+                y: {
+                  ticks: { font: { size: 12 } }
+                }
+              },
+              plugins: {
+                legend: { labels: { font: { size: 12 } } }
+              }
+            } %>
+    </div>
+  <% end %>
+
   <%# 履歴テーブル %>
   <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
     <% if @typing_results.empty? %>
