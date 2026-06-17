@@ -17,7 +17,7 @@ Rails.application.routes.draw do
   get "/typing/result", to: "typing#result"
   post "/typing/results", to: "typing#save_result"
 
-  get "/typing/histories", to: "typing_histories#index"
+  resources :typing_histories, only: [ :index, :show, :update ], path: "typing/histories"
 
   resources :articles, only: [ :index, :create, :destroy ]
 

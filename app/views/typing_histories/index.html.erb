@@ -120,7 +120,10 @@
         </thead>
         <tbody>
           <% @typing_results.each do |result| %>
-            <tr class="border-b border-gray-100 last:border-0 hover:bg-gray-50">
+            <tr class="border-b border-gray-100 last:border-0 hover:bg-gray-50 cursor-pointer"
+                data-controller="row-link"
+                data-row-link-url-value="<%= typing_history_path(result) %>"
+                data-action="click->row-link#visit">
               <td class="px-5 py-2 text-gray-700">
                 <%= result.created_at.strftime("%Y-%m-%d %H:%M") %>
               </td>
