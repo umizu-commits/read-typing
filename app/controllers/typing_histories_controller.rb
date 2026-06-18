@@ -28,7 +28,7 @@ class TypingHistoriesController < ApplicationController
 
   def chart_data
     authorize TypingResult, :index?
-    results = policy_scope(TypingResult).order(created_at: :asc).limit(30)
+    results = policy_scope(TypingResult).order(created_at: :desc).limit(30).to_a.reverse
 
     render json: [
       { name: "WPM", data: results.map { |r| [ r.created_at.strftime("%m月%d日 %H:%M"), r.wpm ] } },
