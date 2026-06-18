@@ -171,6 +171,17 @@ export default class extends Controller {
     const rect = spans[this.currentIndex].getBoundingClientRect()
     this.inputTarget.style.top = `${rect.top + rect.height}px`
     this.inputTarget.style.left = `${rect.left}px`
+
+    // スクロール追従
+    const container = this.textTarget
+    const containerRect = container.getBoundingClientRect()
+    const spanRect = spans[this.currentIndex].getBoundingClientRect()
+
+    if (spanRect.bottom > containerRect.bottom) {
+      container.scrollTop += spanRect.bottom - containerRect.bottom
+    } else if (spanRect.top < containerRect.top) {
+      container.scrollTop += spanRect.top - containerRect.top
+    }
   }
 
 
