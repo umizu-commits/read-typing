@@ -5,6 +5,7 @@ class ArticleBodyExtractor
   UNWANTED_SELECTORS = "nav, header, footer, aside, script, style, noscript, form, button, input, pre, code".freeze
   CONTENT_SELECTORS = "p, h1, h2, h3, h4, h5, h6, li, blockquote".freeze
   MIN_BODY_LENGTH = 50
+  MAX_TITLE_LENGTH = 255
 
   Result = Struct.new(:success?, :body, :title, :error_message, keyword_init: true)
 
@@ -14,7 +15,7 @@ class ArticleBodyExtractor
 
   def call
     doc = Nokogiri::HTML(@html)
-    title = doc.at_css("title")&.text&.strip
+    title = extract_title(doc)
     main_node = doc.at_css("article") || doc.at_css("main") || doc.at_css("body")
     return error_result("本文が見つかりませんでした") if main_node.nil?
 
@@ -45,5 +46,12 @@ class ArticleBodyExtractor
 
   def error_result(message)
     Result.new(success?: false, body: nil, error_message: message)
+  end
+
+  def extract_title(doc)
+    title = doc.at_css('meta[property="og:title"]')&.attr("content")&.strip
+    title = doc.at_css("title")&.text&.strip if title.blank?
+    return nil if title.blank?
+    title.length > MAX_TITLE_LENGTH ? title[0, MAX_TITLE_LENGTH] : title
   end
 end
