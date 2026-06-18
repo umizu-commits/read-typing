@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["text", "input","hint" ,"timer", "typedWindow", "progressBar", "progressText", "totalText"]
+  static targets = ["text", "input","hint" ,"timer", "typedWindow", "progressBar", "progressText", "totalText", "title"]
 
   connect() {
     const text = sessionStorage.getItem("typing_text")
@@ -9,6 +9,15 @@ export default class extends Controller {
     if (!text) {
       window.location.href = "/"
       return
+    }
+
+    // article_titleを読み取り、タイトル表示エリアに反映
+    const title = sessionStorage.getItem("article_title") || ""
+    if (this.hasTitleTarget) {
+      this.titleTarget.textContent = title
+      if (title) {
+        this.titleTarget.classList.remove("hidden")
+      }
     }
 
     this.chars = [...text] // handleInput() の中でも元のテキストを参照できるよう、this.chars に保存

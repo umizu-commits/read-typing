@@ -1,6 +1,7 @@
 <% if @typing_text %>
   <script nonce="<%= content_security_policy_nonce %>">
     sessionStorage.setItem("typing_text", <%= raw @typing_text.to_json %>);
+    sessionStorage.setItem("article_title", <%= raw (@article_title || "").to_json %>);
   </script>
 <% end %>
 
@@ -39,6 +40,11 @@
 
     <%# 右側エリア %>
     <aside class="flex h-full flex-col items-end justify-between overflow-hidden">
+
+      <%# 記事タイトル %>
+      <div data-typing-target="title"
+           class="w-[290px] rounded-xl bg-white border border-gray-200 p-4 text-sm text-gray-700 font-bold shadow-sm hidden">
+      </div>
 
       <%# 上グループ: hint + タイマー %>
       <div class="flex flex-col gap-2">

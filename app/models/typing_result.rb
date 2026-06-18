@@ -8,6 +8,7 @@ class TypingResult < ApplicationRecord
   validates :miss_count, presence: true, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100_000 }  # 記事の最大文字数の10倍程度
   validates :elapsed_time, presence: true, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 86400 } # 24時間
   validates :article_text, presence: true, length: { maximum: 10_000 }
+  validates :article_title, length: { maximum: 255 }, allow_blank: true
 
   scope :recent, -> { order(created_at: :desc) }
 end

@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-    static targets = ["accuracy", "cpm", "wpm", "missCount", "elapsedTime", "saveSuccess", "saveFailed", "saveSkipped", "saveButton", "completedMessage", "endedMessage"]
+    static targets = ["accuracy", "cpm", "wpm", "missCount", "elapsedTime", "saveSuccess", "saveFailed", "saveSkipped", "saveButton", "completedMessage", "endedMessage", "articleTitle", "articleTitleText"]
 
     connect() {
         const raw = sessionStorage.getItem("typing_result")
@@ -30,9 +30,15 @@ export default class extends Controller {
         this.elapsedTimeTarget.textContent = this.formatTime(result.elapsedSeconds)
 
         const articleText = sessionStorage.getItem("typing_text")
+        
+        const articleTitle = sessionStorage.getItem("article_title") || ""
+        if (articleTitle) {
+            this.articleTitleTarget.classList.remove("hidden")
+            this.articleTitleTextTarget.textContent = articleTitle
+        }
 
         if (result.reason === "completed") {
-            const body = { wpm: result.wpm, cpm: result.cpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText }
+            const body = { wpm: result.wpm, cpm: result.cpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText, article_title: articleTitle }
             this.postResult(body, (data) => {
                 if (data.status === "saved") {
                     this.saveSuccessTarget.classList.remove("hidden")
@@ -50,7 +56,7 @@ export default class extends Controller {
             if (isLoggedIn) {
               this.saveButtonTarget.classList.remove("hidden") // 保存ボタンを表示
             } else {
-                const body = { wpm: result.wpm, cpm: result.cpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText }
+                const body = { wpm: result.wpm, cpm: result.cpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText, article_title: articleTitle }
                 this.postResult(body, (data) => {
                     if (data.status === "skipped") {
                         this.saveSkippedTarget.classList.remove("hidden")
@@ -88,8 +94,9 @@ export default class extends Controller {
     // 途中終了時に保存するかの選択で「保存する」を選んだ場合の処理
     saveManually() {
         const articleText = sessionStorage.getItem("typing_text")
+        const articleTitle = sessionStorage.getItem("article_title") || ""
         const result = JSON.parse(sessionStorage.getItem("typing_result"))
-        const body = { wpm: result.wpm, cpm: result.cpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText }
+        const body = { wpm: result.wpm, cpm: result.cpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText, article_title: articleTitle }
 
         this.postResult(body, (data) => {
             if (data.status === "saved") {
@@ -105,6 +112,7 @@ export default class extends Controller {
     goToTop() {
         sessionStorage.removeItem("typing_text")
         sessionStorage.removeItem("typing_result")
+        sessionStorage.removeItem("article_title")
         window.location.href = "/"
     }
 }

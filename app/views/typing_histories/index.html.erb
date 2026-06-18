@@ -145,12 +145,13 @@
       <table class="w-full text-sm">
         <thead>
           <tr class="border-b border-gray-200">
-            <th class="text-left px-5 py-3 text-xs font-bold text-gray-500">実施日時</th>
-            <th class="text-right px-5 py-3 text-xs font-bold text-gray-500">正答率</th>
-            <th class="text-right px-5 py-3 text-xs font-bold text-gray-500">CPM</th>
-            <th class="text-right px-5 py-3 text-xs font-bold text-gray-500">WPM</th>
-            <th class="text-right px-5 py-3 text-xs font-bold text-gray-500">ミス数</th>
-            <th class="text-right px-5 py-3 text-xs font-bold text-gray-500">タイム</th>
+            <th class="text-left px-5 py-3 text-xs font-bold text-gray-500">タイトル</th>
+            <th class="text-right px-5 py-3 text-xs font-bold text-gray-500 whitespace-nowrap">正答率</th>
+            <th class="text-right px-5 py-3 text-xs font-bold text-gray-500 whitespace-nowrap">CPM</th>
+            <th class="text-right px-5 py-3 text-xs font-bold text-gray-500 whitespace-nowrap">WPM</th>
+            <th class="text-right px-5 py-3 text-xs font-bold text-gray-500 whitespace-nowrap">ミス数</th>
+            <th class="text-right px-5 py-3 text-xs font-bold text-gray-500 whitespace-nowrap">タイム</th>
+            <th class="text-right px-5 py-3 text-xs font-bold text-gray-500 whitespace-nowrap">実施日時</th>
           </tr>
         </thead>
         <tbody>
@@ -159,32 +160,38 @@
                 data-controller="row-link"
                 data-row-link-url-value="<%= typing_history_path(result) %>"
                 data-action="click->row-link#visit">
-              <td class="px-5 py-2 text-gray-700">
-                <%= result.created_at.strftime("%Y-%m-%d %H:%M") %>
+              <td class="px-5 py-2 max-w-0 w-full">
+                <% display_title = result.article_title.present? ? result.article_title : (result.article&.title.present? ? result.article.title : "タイトル未設定") %>
+                <div class="truncate text-gray-700" title="<%= display_title %>">
+                  <%= display_title %>
+                </div>
               </td>
-              <td class="px-5 py-1 text-right">
+              <td class="px-5 py-1 text-right whitespace-nowrap">
                 <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-bold">
                   <%= result.accuracy %>%
                 </span>
               </td>
-              <td class="px-5 py-1 text-right font-bold text-blue-400">
+              <td class="px-5 py-1 text-right font-bold text-blue-400 whitespace-nowrap">
                 <%= result.cpm %>
               </td>
-              <td class="px-5 py-1 text-right font-bold text-blue-500">
+              <td class="px-5 py-1 text-right font-bold text-blue-500 whitespace-nowrap">
                 <%= result.wpm %>
               </td>
               <td class="px-5 py-1 text-right font-bold <%= result.miss_count > 5 ? 'text-red-500' : 'text-gray-900' %>">
                 <%= result.miss_count %>
               </td>
-              <td class="px-5 py-1 text-right text-gray-700">
+              <td class="px-5 py-1 text-right text-gray-700 whitespace-nowrap">
                 <%= "%02d:%02d" % [result.elapsed_time / 60, result.elapsed_time % 60] %>
+              </td>
+              <td class="px-5 py-2 text-right text-gray-700 whitespace-nowrap">
+                <%= result.created_at.strftime("%Y-%m-%d %H:%M") %>
               </td>
             </tr>
           <% end %>
           <%# 10件未満のページで高さを維持するための空行 %>
           <% (10 - @typing_results.size).times do %>
             <tr class="border-b border-gray-100 last:border-0">
-              <td class="px-5 py-2" colspan="6">&nbsp;</td>
+              <td class="px-5 py-2" colspan="7">&nbsp;</td>
             </tr>
           <% end %>
         </tbody>
