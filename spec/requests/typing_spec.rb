@@ -3,9 +3,9 @@ require 'rails_helper'
 RSpec.describe "タイピング", type: :request do
   describe "GET /typing" do
     context "article_id が指定されていない場合" do
-      it "ルートにリダイレクトされる" do
+      it "タイピング画面が表示される" do
         get typing_path
-        expect(response).to redirect_to(root_path)
+        expect(response).to have_http_status(:success)
       end
     end
 
