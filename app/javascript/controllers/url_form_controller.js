@@ -29,12 +29,12 @@ export default class extends Controller {
     this.urlTabTarget.classList.remove("border-blue-500", "text-blue-600")
   }
 
-  submitUrl(event) {
+  async submitUrl(event) {
+    event.preventDefault()
     this.urlErrorTarget.classList.add("hidden") // エラーを一旦消す
 
     const url = this.urlInputTarget.value.trim()
     if (url === "") {
-      event.preventDefault()
       this.showUrlError("URLを入力してください")
       return
     }
@@ -42,17 +42,32 @@ export default class extends Controller {
     try {
       const parsed = new URL(url)
       if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-        event.preventDefault()
         this.showUrlError("正しいURL形式で入力してください（例：https://example.com）")
         return
       } 
     } catch {
       // new URL(url) が失敗した場合（完全に不正な文字列）
-      event.preventDefault()
       this.showUrlError("正しいURL形式で入力してください（例：https://example.com）")
       return
     }
+
+    const form = event.target
+    const response = await fetch("/articles", {
+      method: "POST",
+      body: new FormData(form),
+      redirect: "follow"
+    })
+
+    if (response.status === 429) {
+      this.showUrlError("リクエストが多すぎます。しばらく時間をおいてから再度お試しください。")
+      return
+    } 
+
+    if (response.redirected) {
+      window.location.href = response.url
+    }
   }
+
 
   showUrlError(message) {
     this.urlErrorTarget.textContent = message   // ← message を表示する
