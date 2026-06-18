@@ -64,6 +64,7 @@ export default class extends Controller {
     } 
 
     if (response.redirected) {
+      sessionStorage.removeItem("article_title")
       window.location.href = response.url
     }
   }

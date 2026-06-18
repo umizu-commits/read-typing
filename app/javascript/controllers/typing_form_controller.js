@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-static targets = ["text", "error", "clearButton"]
+static targets = ["text", "error", "clearButton", "title"]
 
 submit(event) {
     event.preventDefault()
@@ -24,6 +24,8 @@ submit(event) {
     }
 
     sessionStorage.setItem("typing_text", text)
+    const title = this.titleTarget.value.trim()
+    sessionStorage.setItem("article_title", title)
     window.location.href = "/typing"
 }
 

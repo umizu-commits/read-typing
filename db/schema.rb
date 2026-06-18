@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_16_094221) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_18_094049) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -31,6 +31,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_16_094221) do
     t.float "accuracy"
     t.bigint "article_id"
     t.text "article_text"
+    t.string "article_title"
     t.float "cpm"
     t.datetime "created_at", null: false
     t.integer "elapsed_time"

@@ -81,9 +81,20 @@
         </div>
 
         <form data-action="submit->typing-form#submit">
-          <textarea data-typing-form-target="text"
+          <div class="mb-3">
+            <label class="block text-xs font-bold text-gray-500 mb-1">
+              記事タイトル
+              <span class="text-gray-400 font-normal ml-1">（任意）</span>
+            </label>
+            <input type="text"
+                   data-typing-form-target="title"
+                   placeholder="ここに記事のタイトルを入力してください"
+                   maxlength="255"
+                   class="w-full border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+          </div>           
+          <textarea data-typing-form-target="text" 
                     data-action="input->typing-form#toggleClearButton"
-                    placeholder="ここに技術記事の内容をペーストしてください..."
+                    placeholder="ここに記事の内容をペーストしてください"
                     rows="10"
                     class="w-full border border-gray-200 rounded-lg p-4 text-sm resize-none
                            focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
