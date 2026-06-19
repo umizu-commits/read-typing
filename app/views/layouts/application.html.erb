@@ -4,6 +4,17 @@
     <title><%= content_for(:title) || "ReadTyping" %></title>
     <meta name="viewport" content="width=1280">
     <meta name="user-signed-in" content="<%= user_signed_in? %>">
+    <!-- OG -->
+    <meta property="og:title" content="ReadTyping">
+    <meta property="og:description" content="興味関心のある記事でタイピング練習ができるWebアプリです。">
+    <meta property="og:image" content="https://read-typing-web.onrender.com/og-image.png"> <!-- ドメイン変更時に要変更 -->
+    <meta property="og:url" content="https://read-typing-web.onrender.com/"> <!-- ドメイン変更時に要変更 -->
+    <meta property="og:type" content="website">
+    <!-- Twitter Card用 -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ReadTyping">
+    <meta name="twitter:image" content="https://read-typing-web.onrender.com/og-image.png">
+
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
