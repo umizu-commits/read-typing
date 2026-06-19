@@ -1,7 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-    static targets = ["accuracy", "cpm", "wpm", "missCount", "elapsedTime", "saveSuccess", "saveFailed", "saveSkipped", "saveButton", "completedMessage", "endedMessage", "articleTitle", "articleTitleText"]
+    static targets = ["accuracy", "cpm", "wpm", "missCount", "elapsedTime", "saveSuccess", "saveFailed", "saveSkipped", "saveButton", "completedMessage", "endedMessage", "articleTitle", "articleTitleText", "copySuccess"]
+    static values = { appUrl: String }
 
     connect() {
         const raw = sessionStorage.getItem("typing_result")
@@ -114,5 +115,27 @@ export default class extends Controller {
         sessionStorage.removeItem("typing_result")
         sessionStorage.removeItem("article_title")
         window.location.href = "/"
+    }
+
+    buildShareText() {
+        const result = JSON.parse(sessionStorage.getItem("typing_result"))
+        const appUrl = this.appUrlValue
+        return `ReadTypingでCPM ${result.cpm}・正答率 ${result.accuracy}% を達成しました！\n${appUrl}`
+    }
+
+    shareOnX() {
+        const text = this.buildShareText()
+        const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
+        window.open(url, "_blank", "noopener")
+    }
+
+    copyResult() {
+        const text = this.buildShareText()
+        navigator.clipboard.writeText(text).then(() => {
+            this.copySuccessTarget.classList.remove("hidden")
+            setTimeout(() => {
+                this.copySuccessTarget.classList.add("hidden")
+            }, 2000)
+        })
     }
 }
