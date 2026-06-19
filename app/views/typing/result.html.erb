@@ -3,7 +3,9 @@
 <% content_for :og_description, "ReadTypingでタイピング練習を完了しました！あなたも興味のある記事でタイピング練習をしてみませんか？" %>
 <% content_for :twitter_title, "タイピング結果 | ReadTyping" %>
 
-<div data-controller="result" class="py-10 px-4">
+<div data-controller="result"
+     data-result-app-url-value="<%= root_url %>"
+     class="py-10 px-4">
 
   <%# 通常完了メッセージ（デフォルト表示） %>
   <div data-result-target="completedMessage" class="text-center mb-8">
@@ -26,6 +28,12 @@
   <%# 保存失敗 %>
   <div data-result-target="saveFailed" class="hidden max-w-2xl mx-auto rounded-xl bg-red-50 border border-red-200 p-4 text-center text-sm text-red-700 mb-6">
     結果の保存に失敗しました
+  </div>
+
+  <%# コピー完了 %>
+  <div data-result-target="copySuccess"
+       class="hidden max-w-2xl mx-auto rounded-xl bg-green-50 border border-green-200 p-4 text-center text-sm text-green-700 mb-6">
+    クリップボードにコピーしました
   </div>
 
   <%# 「この記録を保存する」ボタン（途中終了 + ログイン時に表示） %>
@@ -148,6 +156,20 @@
       <%= link_to "履歴を見る", typing_histories_path,
           class: "inline-flex items-center justify-center min-w-[200px] rounded-lg bg-white border border-gray-300 px-6 py-3 font-bold text-gray-700 shadow-sm hover:bg-gray-50" %>
     <% end %>
+
+    <button
+      type="button"
+      data-action="click->result#shareOnX"
+      class="min-w-[200px] rounded-lg bg-white border border-gray-300 px-6 py-3 font-bold text-gray-700 shadow-sm hover:bg-gray-50">
+      Xで共有
+    </button>
+
+    <button
+      type="button"
+      data-action="click->result#copyResult"
+      class="min-w-[200px] rounded-lg bg-white border border-gray-300 px-6 py-3 font-bold text-gray-700 shadow-sm hover:bg-gray-50">
+      結果をコピー
+    </button>
   </div>
 
   <%# 未ログイン（スキップ） %>
