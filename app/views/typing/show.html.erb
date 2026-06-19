@@ -1,3 +1,8 @@
+<% content_for :title, "タイピング練習 | ReadTyping" %>
+<% content_for :og_title, "タイピング練習 | ReadTyping" %>
+<% content_for :og_description, "興味のある記事でタイピング練習を行います。" %>
+<% content_for :twitter_title, "タイピング練習 | ReadTyping" %>
+
 <% if @typing_text %>
   <script nonce="<%= content_security_policy_nonce %>">
     sessionStorage.setItem("typing_text", <%= raw @typing_text.to_json %>);
