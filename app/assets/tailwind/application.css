@@ -1,12 +1,13 @@
 @import "tailwindcss";
 
 @keyframes blink {
-    0%, 100% { text-decoration-color: rgb(128 128 128); }
-    50% { text-decoration-color: transparent; }
+    0%, 100% { background-color: rgb(219 234 254); }  /* bg-blue-100 */
+    50% { background-color: rgb(191 219 254); }       /* bg-blue-200 */
 }
 
 .cursor-blink {
-    text-decoration: underline;
-    text-decoration-thickness: 3px;
+    background-color: rgb(219 234 254);
+    color: rgb(37 99 235);          /* text-blue-600 */
+    border-radius: 0.25rem;
     animation: blink 1s step-start infinite;
 }

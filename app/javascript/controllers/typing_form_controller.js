@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-static targets = ["text", "error", "clearButton", "title"]
+static targets = ["text", "error", "clearButton", "title", "counter"]
 
 submit(event) {
     event.preventDefault()
@@ -45,10 +45,13 @@ clear() {
 
 toggleClearButton(){
     const text = this.textTarget.value.trim()
-    if (text === "") {
-        this.clearButtonTarget.disabled = true
-    } else {
-        this.clearButtonTarget.disabled = false
+    this.clearButtonTarget.disabled = text === ""
+
+    if (this.hasCounterTarget) {
+        const count = text.length
+        this.counterTarget.textContent = `${count.toLocaleString()} / 10,000 文字`
+        this.counterTarget.classList.toggle("text-red-500", count > 10000)
+        this.counterTarget.classList.toggle("text-gray-400", count <= 10000)
     }
 }
 }

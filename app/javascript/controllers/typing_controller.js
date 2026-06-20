@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["text", "input","hint" ,"timer", "typedWindow", "progressBar", "progressText", "totalText", "title"]
+  static targets = ["text", "input","hint" ,"timer", "typedWindow", "progressBar", "progressText", "totalText", "title","progressPercent"]
 
   connect() {
     const text = sessionStorage.getItem("typing_text")
@@ -126,7 +126,7 @@ export default class extends Controller {
       }
     } else {
       this.missCount++ // ミスをカウントする
-      spans[this.currentIndex].className = "text-red-500"
+      spans[this.currentIndex].className = "text-red-500 underline decoration-red-300 decoration-2"
     }
     this.typedText += key // 入力されたキーをTypedTextに追記
     this.typedWindowTarget.textContent = this.typedText // 入力ウィンドウに反映
@@ -186,9 +186,19 @@ export default class extends Controller {
     const containerRect = container.getBoundingClientRect()
     const spanRect = spans[this.currentIndex].getBoundingClientRect()
 
-    if (spanRect.bottom > containerRect.bottom) {
-      container.scrollTop += spanRect.bottom - containerRect.bottom
-    } else if (spanRect.top < containerRect.top) {
+    const containerHeight = containerRect.height
+    const cursorOffsetFromTop = spanRect.top - containerRect.top
+
+    // カーソルが中央より少し下（55%）に入ったら、中央より少し上（45%）まで持ち上げる
+    const triggerLine = containerHeight * 0.55
+    const targetLine = containerHeight * 0.45
+
+    if (cursorOffsetFromTop > triggerLine) {
+      container.scrollTop += cursorOffsetFromTop - targetLine
+    }
+
+    // カーソルが画面上端より上に出た場合（リセット時など）の追従
+    if (spanRect.top < containerRect.top) {
       container.scrollTop += spanRect.top - containerRect.top
     }
   }
@@ -239,7 +249,7 @@ export default class extends Controller {
         }
       } else {
         this.missCount++
-        spans[this.currentIndex].className = "text-red-500"
+        spans[this.currentIndex].className = "text-red-500 underline decoration-red-300 decoration-2"
       }
     }
     this.inputTarget.value = "" // 1回の変換確定後にtextareaをクリアすることで、次の変換開始時にカーソルが先頭に戻る
@@ -343,5 +353,8 @@ export default class extends Controller {
     const percent = Math.round((this.currentIndex / total) * 100)
     this.progressBarTarget.style.width = `${percent}%`
     this.progressTextTarget.textContent = this.currentIndex
+    if (this.hasProgressPercentTarget) {
+      this.progressPercentTarget.textContent = percent
+    }
   } 
 }

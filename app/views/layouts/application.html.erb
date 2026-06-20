@@ -29,7 +29,7 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body data-controller="help" class="bg-slate-50 min-w-[1280px] h-screen flex flex-col">
+  <body data-controller="help" class="bg-slate-50 min-w-[1280px] min-h-screen flex flex-col">
     <header class="w-full bg-white border-b border-gray-200">
       <div class="w-full px-20 h-14 flex items-center justify-between">
         <div class="flex items-center gap-4">
@@ -41,7 +41,7 @@
         <nav class="flex items-center gap-3">
           <% if user_signed_in? %>
             <%= link_to "保存記事", articles_path, class: "text-gray-600 text-sm hover:text-blue-600" %>
-            <%= link_to "履歴一覧", typing_histories_path, class: "text-gray-600 text-sm hover:text-blue-600" %>
+            <%= link_to "履歴一覧", typing_histories_path(tab: :summary), class: "text-gray-600 text-sm hover:text-blue-600" %>
             <%= link_to "ログアウト", destroy_user_session_path, data: { turbo_method: :delete }, class: "bg-blue-400 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm" %>
           <% else %>
             <%= link_to "新規登録", new_user_registration_path, class: "text-gray-600 text-sm hover:text-blue-600" %>
@@ -50,7 +50,7 @@
         </nav>
       </div>
     </header>
-    <main class="flex-1 flex flex-col overflow-y-auto container mx-auto px-5">
+    <main class="flex-1 flex flex-col container mx-auto px-5">
 
       <!-- ログイン系のフラッシュメッセージ -->
       <div id="flash">
@@ -59,15 +59,16 @@
       
       <%= yield %>
     </main>
-    <footer class="border-t border-gray-200 bg-white">
-      <div class="container mx-auto px-5 py-6 text-center text-sm text-gray-400">
-        <div class="flex justify-center gap-6 mb-2">
-          <%= link_to "利用規約", terms_path, class: "hover:text-gray-600" %>
-          <%= link_to "プライバシーポリシー", privacy_path, class: "hover:text-gray-600" %>
+    <% if current_page?(root_path) %>
+      <footer class="border-t border-gray-200 bg-white">
+        <div class="container mx-auto px-5 py-3 text-center text-sm text-gray-400">
+          <div class="flex justify-center gap-6">
+            <%= link_to "利用規約", terms_path, class: "hover:text-gray-600" %>
+            <%= link_to "プライバシーポリシー", privacy_path, class: "hover:text-gray-600" %>
+          </div>
         </div>
-        &copy; 2026 ReadTyping
-      </div>
-    </footer>
+      </footer>
+    <% end %>
     <%# モーダル ヘルプ用 %>
     <div data-help-target="modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div class="bg-white rounded-xl shadow-lg p-8 w-[560px] max-h-[80vh] overflow-y-auto">

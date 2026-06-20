@@ -6,6 +6,17 @@ class TypingHistoriesController < ApplicationController
     @all_typing_results = policy_scope(TypingResult)
     # ページネーション適用（テーブル表示用）
     @typing_results = @all_typing_results.recent.page(params[:page]).per(10)
+    # タブ状態（summary or list）
+    @active_tab = params[:tab] == "list" ? "list" : "summary"
+
+    # 前回比計算（最新と1つ前の結果を取得）
+    recent_two = @all_typing_results.order(created_at: :desc).limit(2).to_a
+    @latest_result = recent_two[0]
+    @prev_result = recent_two[1]
+    if @latest_result && @prev_result
+      @cpm_diff = @latest_result.cpm - @prev_result.cpm
+      @accuracy_diff = @latest_result.accuracy - @prev_result.accuracy
+    end
   end
 
   def show
@@ -31,7 +42,6 @@ class TypingHistoriesController < ApplicationController
     results = policy_scope(TypingResult).order(created_at: :desc).limit(30).to_a.reverse
 
     render json: [
-      { name: "WPM", data: results.map { |r| [ r.created_at.strftime("%m月%d日 %H:%M"), r.wpm ] } },
       { name: "CPM", data: results.map { |r| [ r.created_at.strftime("%m月%d日 %H:%M"), r.cpm ] } }
     ]
   end
