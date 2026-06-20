@@ -1,6 +1,6 @@
 <% content_for :title, "タイピング履歴 | ReadTyping" %>
 
-<div class="py-4 max-w-6xl mx-auto">
+<div class="w-full py-4 max-w-6xl mx-auto">
 
   <%# タイトル %>
   <div class="mb-4">
@@ -8,249 +8,44 @@
     <p class="text-sm text-gray-500 mt-1">これまでの学習成果を確認して、スキルの向上を目指しましょう。</p>
   </div>
 
-  <%# サマリーカード（全件を対象に集計） %>
-  <% if @all_typing_results.any? %>
-    <div class="grid grid-cols-7 gap-4 mb-4">
-
-      <%# 平均正答率 %>
-      <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-        <div class="flex items-center gap-2 mb-3">
-          <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-            <svg class="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div class="text-xs font-bold text-gray-500">平均正答率</div>
-        </div>
-        <div class="text-2xl font-bold text-gray-900 text-center"><%= @all_typing_results.average(:accuracy).to_f.round(1) %>%</div>
+  <% if @all_typing_results.empty? %>
+    <%# 0件時は空状態を直接表示（タブは出さない） %>
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div class="p-10 text-center">
+        <p class="text-sm font-bold text-gray-700 mb-1">まだ履歴がありません</p>
+        <p class="text-xs text-gray-500 mb-5">タイピング練習を完了すると、ここに結果が表示されます。</p>
+        <%= link_to root_path,
+            data: { turbo_frame: "_top" },
+            class: "inline-flex items-center gap-2 rounded-lg bg-blue-500 hover:bg-blue-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm" do %>
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          練習を開始する
+        <% end %>
       </div>
-
-      <%# 平均CPM %>
-      <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-        <div class="flex items-center gap-2 mb-3">
-          <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-            <svg class="w-4 h-4 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          </div>
-          <div class="text-xs font-bold text-gray-500">平均CPM</div>
-        </div>
-        <div class="text-2xl font-bold text-gray-900 text-center"><%= @all_typing_results.average(:cpm).to_f.round(1) %></div>
-      </div>
-
-      <%# 平均WPM %>
-      <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-        <div class="flex items-center gap-2 mb-3">
-          <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-            <svg class="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-          </div>
-          <div class="text-xs font-bold text-gray-500">平均WPM</div>
-        </div>
-        <div class="text-2xl font-bold text-gray-900 text-center"><%= @all_typing_results.average(:wpm).to_f.round(1) %></div>
-      </div>
-
-      <%# 平均ミス回数 %>
-      <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-        <div class="flex items-center gap-2 mb-3">
-          <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
-            <svg class="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-          </div>
-          <div class="text-xs font-bold text-gray-500">平均ミス回数</div>
-        </div>
-        <div class="text-2xl font-bold text-gray-900 text-center"><%= @all_typing_results.average(:miss_count).to_f.round(1) %></div>
-      </div>
-
-      <%# 総練習時間 %>
-      <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-        <div class="flex items-center gap-2 mb-3">
-          <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-            <svg class="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div class="text-xs font-bold text-gray-500">総練習時間</div>
-        </div>
-        <% total_seconds = @all_typing_results.sum(:elapsed_time) %>
-        <% hours = total_seconds / 3600 %>
-        <% minutes = (total_seconds % 3600) / 60 %>
-        <div class="text-2xl font-bold text-gray-900 text-center">
-          <% if hours > 0 %>
-            <%= hours %>h <%= minutes %>m
-          <% else %>
-            <%= minutes %>m
-          <% end %>
-        </div>
-      </div>
-
-      <%# 累積文字数 %>
-      <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-        <div class="flex items-center gap-2 mb-3">
-          <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center">
-            <svg class="w-4 h-4 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          </div>
-          <div class="text-xs font-bold text-gray-500">累積文字数</div>
-        </div>
-        <% total_chars = @all_typing_results.sum(:correct_count) %>
-        <div class="text-2xl font-bold text-gray-900 text-center">
-          <% if total_chars >= 10000 %>
-            <%= (total_chars / 10000.0).round(1) %>万字
-          <% else %>
-            <%= total_chars %>字
-          <% end %>
-        </div>
-      </div>
-
-
-      <%# 完了セッション %>
-      <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-        <div class="flex items-center gap-2 mb-3">
-          <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-            <svg class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-            </svg>
-          </div>
-          <div class="text-xs font-bold text-gray-500">完了セッション</div>
-        </div>
-        <div class="text-2xl font-bold text-gray-900 text-center"><%= @all_typing_results.count %> 回</div>
-      </div>
-
     </div>
-  <% end %>
-
-  <%# WPM・CPM推移グラフ %>
-  <% if @all_typing_results.any? %>
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5 mb-4">
-      <div class="flex items-center gap-2 mb-4">
-        <div class="text-xs font-bold text-gray-500">WPM・CPM 推移グラフ</div>
-        <div class="text-xs text-gray-400">（直近30件）</div>
-      </div>
-      <%= line_chart chart_data_typing_histories_path(format: :json),
-            height: "300px",
-            colors: ["#3b82f6", "#60a5fa"],
-            curve: false,
-            points: true,
-            legend: "bottom",
-            library: {
-              devicePixelRatio: 2,
-              scales: {
-                x: {
-                  ticks: {
-                    maxTicksLimit: 8,
-                    maxRotation: 30,
-                    minRotation: 30,
-                    font: { size: 12 }
-                  }
-                },
-                y: {
-                  ticks: { font: { size: 12 } }
-                }
-              },
-              plugins: {
-                legend: { labels: { font: { size: 12 } } }
-              }
-            } %>
+  <% else %>
+    <%# タブUI（1件以上ある時のみ表示） %>
+    <div class="border-b border-gray-200 mb-6">
+      <nav class="flex gap-1" aria-label="タブ">
+        <%= link_to typing_histories_path(tab: :summary),
+            class: "px-5 py-2.5 text-sm font-bold border-b-2 #{@active_tab == 'summary' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-blue-500'}" do %>
+          成長サマリー
+        <% end %>
+        <%= link_to typing_histories_path(tab: :list),
+            class: "px-5 py-2.5 text-sm font-bold border-b-2 #{@active_tab == 'list' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-blue-500'}" do %>
+          履歴一覧
+        <% end %>
+      </nav>
     </div>
-  <% end %>
 
-  <%# 履歴テーブル %>
-  <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-    <% if @typing_results.empty? %>
-      <div class="p-10 text-center text-sm text-gray-500">
-        まだ履歴がありません
-      </div>
+    <%# タブ別コンテンツ %>
+    <% if @active_tab == "summary" %>
+      <%= render "summary_tab" %>
     <% else %>
-      <table class="w-full text-sm">
-        <thead>
-          <tr class="border-b border-gray-200">
-            <th class="text-left px-5 py-3 text-xs font-bold text-gray-500">タイトル</th>
-            <th class="text-right px-5 py-3 text-xs font-bold text-gray-500 whitespace-nowrap">正答率</th>
-            <th class="text-right px-5 py-3 text-xs font-bold text-gray-500 whitespace-nowrap">CPM</th>
-            <th class="text-right px-5 py-3 text-xs font-bold text-gray-500 whitespace-nowrap">WPM</th>
-            <th class="text-right px-5 py-3 text-xs font-bold text-gray-500 whitespace-nowrap">ミス数</th>
-            <th class="text-right px-5 py-3 text-xs font-bold text-gray-500 whitespace-nowrap">タイム</th>
-            <th class="text-right px-5 py-3 text-xs font-bold text-gray-500 whitespace-nowrap">実施日時</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% @typing_results.each do |result| %>
-            <tr class="border-b border-gray-100 last:border-0 hover:bg-gray-50 cursor-pointer"
-                data-controller="row-link"
-                data-row-link-url-value="<%= typing_history_path(result) %>"
-                data-action="click->row-link#visit">
-              <td class="px-5 py-2 max-w-0 w-full">
-                <% display_title = result.article_title.present? ? result.article_title : (result.article&.title.present? ? result.article.title : "タイトル未設定") %>
-                <div class="truncate text-gray-700" title="<%= display_title %>">
-                  <%= display_title %>
-                </div>
-              </td>
-              <td class="px-5 py-1 text-right whitespace-nowrap">
-                <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-bold">
-                  <%= result.accuracy %>%
-                </span>
-              </td>
-              <td class="px-5 py-1 text-right font-bold text-blue-400 whitespace-nowrap">
-                <%= result.cpm %>
-              </td>
-              <td class="px-5 py-1 text-right font-bold text-blue-500 whitespace-nowrap">
-                <%= result.wpm %>
-              </td>
-              <td class="px-5 py-1 text-right font-bold <%= result.miss_count > 5 ? 'text-red-500' : 'text-gray-900' %>">
-                <%= result.miss_count %>
-              </td>
-              <td class="px-5 py-1 text-right text-gray-700 whitespace-nowrap">
-                <%= "%02d:%02d" % [result.elapsed_time / 60, result.elapsed_time % 60] %>
-              </td>
-              <td class="px-5 py-2 text-right text-gray-700 whitespace-nowrap">
-                <%= result.created_at.strftime("%Y-%m-%d %H:%M") %>
-              </td>
-            </tr>
-          <% end %>
-          <%# 10件未満のページで高さを維持するための空行 %>
-          <% (10 - @typing_results.size).times do %>
-            <tr class="border-b border-gray-100 last:border-0">
-              <td class="px-5 py-2" colspan="7">&nbsp;</td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-
-      <div class="px-5 py-3 border-t border-gray-100 text-xs text-gray-400 text-center">
-        全 <%= @typing_results.total_count %> セッション中 <%= @typing_results.offset_value + 1 %>-<%= [@typing_results.offset_value + 10, @typing_results.total_count].min %> を表示中
-      </div>
-      <% if @typing_results.total_pages > 1 %>
-        <div class="px-5 py-3 border-t border-gray-100 flex justify-center items-center gap-1">
-          <%# 前へ %>
-          <% if @typing_results.prev_page %>
-            <%= link_to "前へ", typing_histories_path(page: @typing_results.prev_page),
-                class: "px-3 h-8 flex items-center justify-center rounded text-gray-600 hover:text-blue-500 hover:bg-blue-50 text-xs font-medium" %>
-          <% end %>
-
-          <%# ページ番号 %>
-          <% (1..@typing_results.total_pages).each do |page_num| %>
-            <% if page_num == @typing_results.current_page %>
-              <span class="w-8 h-8 flex items-center justify-center rounded bg-blue-500 text-white text-xs font-bold">
-                <%= page_num %>
-              </span>
-            <% else %>
-              <%= link_to page_num, typing_histories_path(page: page_num),
-                  class: "w-8 h-8 flex items-center justify-center rounded text-gray-600 hover:text-blue-500 hover:bg-blue-50 text-xs font-medium" %>
-            <% end %>
-          <% end %>
-
-          <%# 次へ %>
-          <% if @typing_results.next_page %>
-            <%= link_to "次へ", typing_histories_path(page: @typing_results.next_page),
-                class: "px-3 h-8 flex items-center justify-center rounded text-gray-600 hover:text-blue-500 hover:bg-blue-50 text-xs font-medium" %>
-          <% end %>
-        </div>
-      <% end %>
+      <%= render "list_tab" %>
     <% end %>
-  </div>
+  <% end %>
 
 </div>

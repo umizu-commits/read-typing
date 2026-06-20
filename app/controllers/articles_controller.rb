@@ -10,7 +10,7 @@ class ArticlesController < ApplicationController
 
   def index
     authorize Article # ArticlePolicy#index? を呼ぶ（未ログインなら弾く）
-    @articles = policy_scope(Article)  # Scope#resolve を呼ぶ（自分の記事だけ取得）
+    @articles = policy_scope(Article).order(created_at: :desc).page(params[:page]).per(20)  # Scope#resolve を呼ぶ（自分の記事だけ取得）
   end
 
   def destroy

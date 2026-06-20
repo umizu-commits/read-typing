@@ -1,0 +1,174 @@
+<%# サマリーカード（全件を対象に集計） %>
+<% if @all_typing_results.any? %>
+
+  <%# メインカード: CPM + 正答率（主役） %>
+  <div class="grid grid-cols-2 gap-4 mb-4">
+
+    <%# CPM（メイン・最新値+前回比） %>
+    <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+          <svg class="w-4 h-4 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <div class="text-xs font-bold text-gray-500">CPM</div>
+      </div>
+      <div class="text-4xl font-bold text-gray-900 text-center"><%= @latest_result.cpm %></div>
+      <div class="text-center mt-2">
+        <% if @cpm_diff %>
+          <% if @cpm_diff > 0 %>
+            <span class="text-xs font-bold text-green-600">前回比 +<%= @cpm_diff %></span>
+          <% elsif @cpm_diff < 0 %>
+            <span class="text-xs font-bold text-red-600">前回比 <%= @cpm_diff %></span>
+          <% else %>
+            <span class="text-xs font-bold text-gray-500">前回比 ±0</span>
+          <% end %>
+        <% else %>
+          <span class="text-xs text-gray-400">前回データなし</span>
+        <% end %>
+      </div>
+      <div class="text-center text-xs text-gray-400 mt-2">
+        WPM目安: <%= @latest_result.wpm %>
+      </div>
+    </div>
+
+    <%# 正答率（メイン・最新値+前回比） %>
+    <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+          <svg class="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div class="text-xs font-bold text-gray-500">正答率</div>
+      </div>
+      <div class="text-4xl font-bold text-gray-900 text-center"><%= @latest_result.accuracy %>%</div>
+      <div class="text-center mt-2">
+        <% if @accuracy_diff %>
+          <% if @accuracy_diff > 0 %>
+            <span class="text-xs font-bold text-green-600">前回比 +<%= @accuracy_diff %>%</span>
+          <% elsif @accuracy_diff < 0 %>
+            <span class="text-xs font-bold text-red-600">前回比 <%= @accuracy_diff %>%</span>
+          <% else %>
+            <span class="text-xs font-bold text-gray-500">前回比 ±0%</span>
+          <% end %>
+        <% else %>
+          <span class="text-xs text-gray-400">前回データなし</span>
+        <% end %>
+      </div>
+      <div class="text-center text-xs mt-2 invisible">高さ調整</div>
+    </div>
+
+  </div>
+
+  <%# 補助カード: 4小カード %>
+  <div class="grid grid-cols-4 gap-4 mb-3">
+
+    <%# 累積文字数 %>
+    <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm">
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-7 h-7 rounded-full bg-yellow-100 flex items-center justify-center">
+          <svg class="w-3.5 h-3.5 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </div>
+        <div class="text-xs font-bold text-gray-500">累積文字数</div>
+      </div>
+      <% total_chars = @all_typing_results.sum(:correct_count) %>
+      <div class="text-2xl font-bold text-gray-900 text-center">
+        <% if total_chars >= 10000 %>
+          <%= (total_chars / 10000.0).round(1) %>万字
+        <% else %>
+          <%= total_chars %>字
+        <% end %>
+      </div>
+    </div>
+
+    <%# 総練習時間 %>
+    <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm">
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center">
+          <svg class="w-3.5 h-3.5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div class="text-xs font-bold text-gray-500">総練習時間</div>
+      </div>
+      <% total_seconds = @all_typing_results.sum(:elapsed_time) %>
+      <% hours = total_seconds / 3600 %>
+      <% minutes = (total_seconds % 3600) / 60 %>
+      <div class="text-2xl font-bold text-gray-900 text-center">
+        <% if hours > 0 %>
+          <%= hours %>h <%= minutes %>m
+        <% else %>
+          <%= minutes %>m
+        <% end %>
+      </div>
+    </div>
+
+    <%# 完了セッション %>
+    <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm">
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center">
+          <svg class="w-3.5 h-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+          </svg>
+        </div>
+        <div class="text-xs font-bold text-gray-500">完了セッション</div>
+      </div>
+      <div class="text-2xl font-bold text-gray-900 text-center"><%= @all_typing_results.count %> 回</div>
+    </div>
+
+    <%# 平均ミス回数 %>
+    <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm">
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-7 h-7 rounded-full bg-red-100 flex items-center justify-center">
+          <svg class="w-3.5 h-3.5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <div class="text-xs font-bold text-gray-500">平均ミス回数</div>
+      </div>
+      <div class="text-2xl font-bold text-gray-900 text-center"><%= @all_typing_results.average(:miss_count).to_f.round(1) %></div>
+    </div>
+
+  </div>
+<% end %>
+
+<%# CPM推移グラフ %>
+<% if @all_typing_results.any? %>
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-6">
+    <div class="flex items-start justify-between mb-3">
+      <div>
+        <h2 class="text-base font-bold text-gray-800">CPM 推移</h2>
+        <p class="text-xs text-gray-500 mt-1">直近30回の練習結果から、タイピング速度の変化を確認できます。</p>
+      </div>
+      <span class="inline-flex items-center rounded-full bg-blue-50 text-blue-700 px-3 py-1 text-xs font-bold shrink-0">
+        直近30件
+      </span>
+    </div>
+    <%= line_chart chart_data_typing_histories_path(format: :json),
+          height: "250px",
+          colors: ["#3b82f6"],
+          curve: false,
+          points: true,
+          legend: false,
+          library: {
+            devicePixelRatio: 2,
+            scales: {
+              x: {
+                ticks: {
+                  maxTicksLimit: 8,
+                  maxRotation: 30,
+                  minRotation: 30,
+                  font: { size: 12 }
+                }
+              },
+              y: {
+                ticks: { font: { size: 12 } }
+              }
+            }
+          } %>
+  </div>
+<% end %>
