@@ -54,4 +54,34 @@ toggleClearButton(){
         this.counterTarget.classList.toggle("text-gray-400", count <= 10000)
     }
 }
+
+submitWithSave(event) {
+    const text = this.textTarget.value.trim()
+    if (text === "") { this.showError("テキストを入力してください"); return }
+    if (text.length < 50) { this.showError("50文字以上のテキストを入力してください"); return }
+    if (text.length > 10000) { this.showError("10,000文字以内のテキストを入力してください"); return }
+
+    // POST /articles に source_type: "text" で送信
+    const form = document.createElement("form")
+    form.method = "post"
+    form.action = "/articles"
+
+    const fields = {
+        authenticity_token: document.querySelector("meta[name='csrf-token']").content,
+        source_type: "text",
+        body: text,
+        title: this.titleTarget.value.trim()
+    }
+
+    Object.entries(fields).forEach(([name, value]) => {
+        const input = document.createElement("input")
+        input.type = "hidden"
+        input.name = name
+        input.value = value
+        form.appendChild(input)
+    })
+
+    document.body.appendChild(form)
+    form.submit()
+  }
 }

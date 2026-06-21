@@ -1,6 +1,12 @@
 class ArticlesController < ApplicationController
   def create
-    form = ArticleForm.new(url: params[:url], user: current_user)
+    form = case params[:source_type]
+    when "text"
+             ArticleTextForm.new(body: params[:body], title: params[:title], user: current_user)
+    else
+             ArticleForm.new(url: params[:url], user: current_user)
+    end
+
     if form.save
       redirect_to typing_path(article_id: form.article.id)
     else

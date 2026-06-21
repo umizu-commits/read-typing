@@ -61,6 +61,12 @@
                         rounded-lg mt-4 cursor-pointer transition-colors">
             記事を取得してタイピング練習を開始する
           </button>
+
+          <button type="button"
+                  data-action="click->url-form#fetchWithoutSave"
+                  class="w-full bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 font-bold py-3 rounded-lg mt-2 cursor-pointer transition-colors">
+            保存せずに開始する
+          </button>
         </form>
       </div>
 
@@ -120,10 +126,15 @@
             </p>
           </div>
 
+          <button type="button"
+                  data-action="click->typing-form#submitWithSave"
+                  class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg mt-4 cursor-pointer transition-colors">
+            テキストを保存して練習を開始する
+          </button>
+
           <button type="submit"
-                  class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg mt-4
-                         cursor-pointer transition-colors">
-            タイピング練習を開始する
+                  class="w-full bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 font-bold py-3 rounded-lg mt-2 cursor-pointer transition-colors">
+            保存せずに練習を開始する
           </button>
         </form>
       </div>

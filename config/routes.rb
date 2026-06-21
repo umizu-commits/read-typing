@@ -31,4 +31,6 @@ Rails.application.routes.draw do
   if Rails.env.development?
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end
+
+  post "articles/fetch", to: "articles/fetch#create", as: :articles_fetch
 end

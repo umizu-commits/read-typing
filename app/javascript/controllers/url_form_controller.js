@@ -74,4 +74,47 @@ export default class extends Controller {
     this.urlErrorTarget.textContent = message   // ← message を表示する
     this.urlErrorTarget.classList.remove("hidden")
   }
+
+  async fetchWithoutSave(event) {
+    this.urlErrorTarget.classList.add("hidden")
+
+    // URL バリデーション（submitUrl と同じ）
+    const url = this.urlInputTarget.value.trim()
+    if (url === "") { this.showUrlError("URLを入力してください"); return }
+    try {
+      const parsed = new URL(url)
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+        this.showUrlError("正しいURL形式で入力してください（例：https://example.com）"); return
+      }
+    } catch {
+      this.showUrlError("正しいURL形式で入力してください（例：https://example.com）"); return
+    }
+
+    // POST /articles/fetch へ JSON で送信
+    const csrfToken = document.querySelector("meta[name='csrf-token']").content
+    const response = await fetch("/articles/fetch", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": csrfToken
+      },
+      body: JSON.stringify({ url })
+    })
+
+    if (!response.ok) {
+      try {
+        const data = await response.json()
+        this.showUrlError(data.error || "記事の取得に失敗しました")
+      } catch {
+        this.showUrlError("記事の取得に失敗しました")
+      }
+      return
+    }
+
+    // sessionStorage に保存して /typing へ遷移
+    const data = await response.json()
+    sessionStorage.setItem("typing_text", data.body)
+    sessionStorage.setItem("article_title", data.title || "")
+    window.location.href = "/typing"
+  }
 }
