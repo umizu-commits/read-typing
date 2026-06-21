@@ -5,7 +5,8 @@ class Article < ApplicationRecord
   belongs_to :user, optional: true
   has_many :typing_results, dependent: :nullify
 
-  validates :url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]), message: "は正しいURL形式で入力してください" }
+  enum :source_type, { url: "url", text: "text" }
+  validates :url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]), message: "は正しいURL形式で入力してください" }, if: :url?
   validates :body, presence: true
 
   before_validation :set_expires_at_for_anonymous, on: :create
