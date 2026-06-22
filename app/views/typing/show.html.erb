@@ -98,6 +98,14 @@
       <div class="w-[290px] rounded-xl bg-gray-50 border border-gray-200 p-3 flex flex-col gap-2">
         <button
           type="button"
+          data-action="click->typing#toggleSkipMode"
+          data-typing-target="skipModeButton"
+          class="rounded-lg bg-white border border-gray-300 px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50">
+          スキップモード: OFF
+        </button>
+
+        <button
+          type="button"
           data-action="click->typing#reset"
           class="rounded-lg bg-white border border-gray-300 px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50">
           再挑戦する

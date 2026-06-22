@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["text", "input","hint" ,"timer", "typedWindow", "progressBar", "progressText", "totalText", "title","progressPercent", "keyboard"]
+  static targets = ["text", "input","hint" ,"timer", "typedWindow", "progressBar", "progressText", "totalText", "title","progressPercent", "keyboard", "skipModeButton"]
 
   connect() {
     const text = sessionStorage.getItem("typing_text")
@@ -61,6 +61,11 @@ export default class extends Controller {
     this.elapsedSeconds = 0
     this.timerTarget.textContent = "00:00"
 
+    // スキップモードの状態
+    this.skipModeEnabled = false
+
+    // スキップした文字数のカウント
+    this.skippedCount = 0
 
     this.skipNonTypableChars()
 
@@ -109,8 +114,32 @@ export default class extends Controller {
 
     // ShiftやCtrlなどを無視する部分
     if (event.key.length !== 1) return
+
     //スペースキーは無視する
-    if (event.key === " ") return
+    if (event.key === " ") {
+      event.preventDefault()
+      if (this.skipModeEnabled && !this.isCompleted && this.isSkippableChar(this.chars[this.currentIndex])) {
+        if (!this.isStarted) {
+          this.isStarted = true
+          this.startTimer()
+          this.hintTarget.classList.add("hidden")
+        }
+        const spans = this.textTarget.querySelectorAll("span")
+        spans[this.currentIndex].className = "text-gray-300 line-through"
+        this.skippedCount++
+        this.currentIndex++
+        this.skipNonTypableChars()
+        this.updateCursor()
+
+        if (this.currentIndex >= this.chars.length) {
+          this.isCompleted = true
+          this.stopTimer()
+          this.saveResult("completed")
+          window.location.href = "/typing/result"
+        }
+      }
+      return
+    }
 
     // textareaへの文字蓄積を防ぐ
     event.preventDefault() // デフォルトのキー入力を無効にする
@@ -160,6 +189,7 @@ export default class extends Controller {
     this.currentIndex = 0
     this.missCount = 0
     this.correctCount = 0
+    this.skippedCount = 0
     this.isCompleted = false
 
     this.textTarget.querySelectorAll("span").forEach(span => {
@@ -173,6 +203,13 @@ export default class extends Controller {
     this.updateProgress()
   }
 
+  toggleSkipMode() {
+    this.skipModeEnabled = !this.skipModeEnabled
+    if (this.hasSkipModeButtonTarget) {
+      this.skipModeButtonTarget.textContent = `スキップモード: ${this.skipModeEnabled ? "ON" : "OFF"}`
+    }
+  }
+
   // 現在の入力位置がスペースや改行の場合、入力済み扱いにして次の文字へ進める
   skipNonTypableChars() {
     while (
@@ -181,6 +218,23 @@ export default class extends Controller {
     ) {
       this.currentIndex++
     }
+  }
+
+  // スキップ対象かどうかを判定するメソッド
+  isSkippableChar(char) {
+    // 英数字・ひらがな・カタカナ・漢字はスキップ不可
+    if (/[a-zA-Z0-9]/.test(char)) return false
+    if (/[\u3040-\u309F]/.test(char)) return false  // ひらがな
+    if (/[\u30FB\u30FC]/.test(char)) return true    // ・ー（カタカナ系記号）カタカナより先にスキップ
+    if (/[\u30A0-\u30FF]/.test(char)) return false  // カタカナ
+    if (/[\u4E00-\u9FFF]/.test(char)) return false  // 漢字（CJK統合）
+
+    // ASCII記号・全角記号はスキップ可
+    if (/[!-/:-@[-`{-~]/.test(char)) return true    // ASCII記号
+    if (/[\uFF00-\uFFEF]/.test(char)) return true   // 全角英数・記号
+    if (/[\u3000-\u303F]/.test(char)) return true   // CJK記号・句読点（。、・など）
+
+    return false
   }
 
   //テキストエリア部分をクリックするとフォーカスが戻る
@@ -365,6 +419,7 @@ export default class extends Controller {
     const result = {
       correctCount: this.correctCount,
       missCount: this.missCount,
+      skippedCount: this.skippedCount,
       elapsedSeconds: this.elapsedSeconds,
       accuracy: this.calculateAccuracy(),
       cpm: this.calculateCpm(),
