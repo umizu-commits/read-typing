@@ -12,4 +12,8 @@ class ArticlePolicy < ApplicationPolicy
       scope.where(user: user)
     end
   end
+
+  def favorite?
+    user.present? && record.user == user
+  end
 end
