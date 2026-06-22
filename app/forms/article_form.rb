@@ -1,10 +1,11 @@
 class ArticleForm
   include ActiveModel::Model
 
-  attr_accessor :url, :user
+  attr_accessor :url, :user, :category, :tag_names
 
   validates :url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]), message: "は正しいURL形式で入力してください" }
   validate :url_must_use_hostname
+  validates :category, inclusion: { in: Article::CATEGORIES.keys }, allow_blank: true
 
   def save
     return false unless valid?
@@ -31,10 +32,12 @@ class ArticleForm
       @article = Article.find_or_create_by!(url: url, user_id: user&.id) do |a|
         a.body = preprocess_result.body
         a.title = extract_result.title
+        a.category = category
       end
     rescue ActiveRecord::RecordNotUnique
       @article = Article.find_by!(url: url, user_id: user&.id)
     end
+    attach_tags(@article)
     true
   end
 
@@ -55,5 +58,13 @@ class ArticleForm
     nil # ドメイン名なので OK
   rescue URI::InvalidURIError
     nil # format バリデーションに任せる
+  end
+
+  def attach_tags(article)
+    return if tag_names.blank?
+
+    names = tag_names.split(",").map(&:strip).reject(&:blank?).uniq
+    tags = names.map { |name| Tag.find_or_create_by!(name: name) }
+    article.tags = tags
   end
 end

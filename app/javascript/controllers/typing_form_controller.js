@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-static targets = ["text", "error", "clearButton", "title", "counter"]
+static targets = ["text", "error", "clearButton", "title", "counter", "category", "tagNames"]
 
 submit(event) {
     event.preventDefault()
@@ -70,7 +70,9 @@ submitWithSave(event) {
         authenticity_token: document.querySelector("meta[name='csrf-token']").content,
         source_type: "text",
         body: text,
-        title: this.titleTarget.value.trim()
+        title: this.titleTarget.value.trim(),
+        category: this.categoryTarget.value,
+        tag_names: this.tagNamesTarget.value
     }
 
     Object.entries(fields).forEach(([name, value]) => {
