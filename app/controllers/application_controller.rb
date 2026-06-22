@@ -30,8 +30,13 @@ class ApplicationController < ActionController::Base
   private
 
   def user_not_authorized
-    flash[:alert] = "このページへのアクセス権限がありません。"
-    redirect_to root_path
+    if user_signed_in?
+      flash[:alert] = "このページへのアクセス権限がありません。"
+      redirect_to root_path
+    else
+      flash[:alert] = "ログインしてください。"
+      redirect_to new_user_session_path
+    end
   end
 
   def record_not_found

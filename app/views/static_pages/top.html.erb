@@ -54,10 +54,35 @@
                  name="url"
                  data-url-form-target="urlInput"
                  placeholder="https://example.com/article"
-                 class="w-full border border-gray-200 rounded-lg p-3 text-sm 
+                 class="w-full border border-gray-200 rounded-lg p-3 text-sm
                         focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <div class="mt-4">
+            <label class="block text-xs font-bold text-gray-500 mb-1">
+              カテゴリ
+              <span class="text-gray-400 font-normal ml-1">（任意）</span>
+            </label>
+            <select name="category"
+                    class="w-full border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-700">
+              <option value="">選択しない</option>
+              <% Article::CATEGORIES.each do |value, label| %>
+                <option value="<%= value %>"><%= label %></option>
+              <% end %>
+            </select>
+          </div>
+
+          <div class="mt-4">
+            <label class="block text-xs font-bold text-gray-500 mb-1">
+              タグ
+              <span class="text-gray-400 font-normal ml-1">（任意・カンマ区切りで複数入力可）</span>
+            </label>
+            <input type="text"
+                   name="tag_names"
+                   placeholder="例：Rails, タイピング, 技術"
+                   class="w-full border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+          </div>
+
           <button type="submit"
-                  class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 
+                  class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3
                         rounded-lg mt-4 cursor-pointer transition-colors">
             記事を取得してタイピング練習を開始する
           </button>
@@ -89,6 +114,31 @@
         </div>
 
         <form data-action="submit->typing-form#submit">
+          <div class="mb-3">
+            <label class="block text-xs font-bold text-gray-500 mb-1">
+              カテゴリ
+              <span class="text-gray-400 font-normal ml-1">（任意）</span>
+            </label>
+            <select data-typing-form-target="category"
+                    class="w-full border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-700">
+              <option value="">選択しない</option>
+              <% Article::CATEGORIES.each do |value, label| %>
+                <option value="<%= value %>"><%= label %></option>
+              <% end %>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="block text-xs font-bold text-gray-500 mb-1">
+              タグ
+              <span class="text-gray-400 font-normal ml-1">（任意・カンマ区切りで複数入力可）</span>
+            </label>
+            <input type="text"
+                   data-typing-form-target="tagNames"
+                   placeholder="例：Rails, タイピング, 技術"
+                   class="w-full border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+          </div>
+
           <div class="mb-3">
             <label class="block text-xs font-bold text-gray-500 mb-1">
               記事タイトル

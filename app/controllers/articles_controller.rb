@@ -2,9 +2,9 @@ class ArticlesController < ApplicationController
   def create
     form = case params[:source_type]
     when "text"
-             ArticleTextForm.new(body: params[:body], title: params[:title], user: current_user)
+      ArticleTextForm.new(body: params[:body], title: params[:title], category: params[:category], tag_names: params[:tag_names], user: current_user)
     else
-             ArticleForm.new(url: params[:url], user: current_user)
+      ArticleForm.new(url: params[:url], category: params[:category], tag_names: params[:tag_names], user: current_user)
     end
 
     if form.save
@@ -18,10 +18,14 @@ class ArticlesController < ApplicationController
     authorize Article # ArticlePolicy#index? を呼ぶ（未ログインなら弾く）
     articles = policy_scope(Article)
     articles = articles.search_by_keyword(params[:q].strip) if params[:q].present?
+    articles = articles.by_category(params[:category])
+    articles = articles.by_tag(params[:tag]) if params[:tag].present?
     articles = articles.sorted_by(params[:sort].presence || "newest")
-    @articles = articles.page(params[:page]).per(20)
+    @articles = articles.includes(:tags).page(params[:page]).per(20)
     @current_sort = params[:sort].presence || "newest"
     @current_keyword = params[:q].to_s.strip
+    @current_category = params[:category].to_s
+    @current_tag = params[:tag].to_s
   end
 
   def destroy
