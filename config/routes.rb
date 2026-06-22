@@ -23,7 +23,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :articles, only: [ :index, :create, :destroy, :edit, :update ] do
+  resources :articles, only: [ :index, :create, :destroy, :edit, :update, :show ] do
     member do
       post :favorite
     end

@@ -3,6 +3,10 @@ class ArticlePolicy < ApplicationPolicy
     user.present?
   end
 
+  def show?
+    user.present? && record.user == user
+  end
+
   def destroy?
     user.present? && record.user == user
   end

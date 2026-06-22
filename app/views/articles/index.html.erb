@@ -126,9 +126,11 @@
         <% @articles.each do |article| %>
           <li class="px-6 py-4 hover:bg-gray-50 flex items-center justify-between gap-4">
             <div class="min-w-0 flex-1">
-              <p class="text-base font-bold text-gray-800 truncate">
-                <%= article.title.presence || "タイトルなし" %>
-              </p>
+              <%= link_to article_path(article),
+                data: { turbo_frame: "_top" },
+                class: "text-base font-bold text-gray-800 truncate hover:text-blue-600 hover:underline transition-colors block" do %>
+              <%= article.title.presence || "タイトルなし" %>
+            <% end %>
               <% if article.category.present? %>
                 <span class="inline-block mt-1 px-2 py-0.5 rounded text-xs font-bold bg-blue-50 text-blue-600">
                   <%= Article::CATEGORIES[article.category] %>
