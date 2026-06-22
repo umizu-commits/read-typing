@@ -37,6 +37,38 @@ class ArticlesController < ApplicationController
     redirect_to articles_path, notice: "記事を削除しました"
   end
 
+  def edit
+    @article = Article.find(params[:id])
+    authorize @article
+
+    current_tags = @article.tags.map(&:name).join(", ")
+    @form = ArticleEditForm.new(
+      article: @article,
+      params: {
+        title:     @article.title,
+        body:      @article.body,
+        category:  @article.category,
+        tag_names: current_tags
+      }
+    )
+  end
+
+  def update
+    @article = Article.find(params[:id])
+    authorize @article
+
+    @form = ArticleEditForm.new(
+      article: @article,
+      params:  article_edit_params
+    )
+
+    if @form.update
+      redirect_to articles_path, notice: "記事を更新しました"
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
   def favorite
     @article = Article.find(params[:id])
     authorize @article, :favorite?
@@ -59,5 +91,11 @@ class ArticlesController < ApplicationController
       partial: "articles/favorite_button",
       locals: { article: @article, favorited: favorited }
     )
+  end
+
+  private
+
+  def article_edit_params
+    params.permit(:title, :body, :category, :tag_names)
   end
 end
