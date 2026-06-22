@@ -16,7 +16,12 @@ class ArticlesController < ApplicationController
 
   def index
     authorize Article # ArticlePolicy#index? を呼ぶ（未ログインなら弾く）
-    @articles = policy_scope(Article).order(created_at: :desc).page(params[:page]).per(20)  # Scope#resolve を呼ぶ（自分の記事だけ取得）
+    articles = policy_scope(Article)
+    articles = articles.search_by_keyword(params[:q].strip) if params[:q].present?
+    articles = articles.sorted_by(params[:sort].presence || "newest")
+    @articles = articles.page(params[:page]).per(20)
+    @current_sort = params[:sort].presence || "newest"
+    @current_keyword = params[:q].to_s.strip
   end
 
   def destroy

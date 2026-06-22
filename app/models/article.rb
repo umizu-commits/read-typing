@@ -13,6 +13,28 @@ class Article < ApplicationRecord
 
   scope :expired, -> { where("expires_at IS NOT NULL AND expires_at < ?", Time.current) }
 
+  scope :search_by_keyword, ->(keyword) {
+    where("title ILIKE :q OR url ILIKE :q", q: "%#{sanitize_sql_like(keyword)}%")
+  }
+
+  SORT_OPTIONS = {
+    "newest" => { created_at: :desc },
+    "oldest" => { created_at: :asc },
+    "title_asc" => { title: :asc },
+    "title_desc" => { title: :desc }
+  }.freeze
+
+  SORT_LABELS = {
+    "newest"     => "新しい順",
+    "oldest"     => "古い順",
+    "title_asc"  => "タイトル昇順",
+    "title_desc" => "タイトル降順"
+  }.freeze
+
+  scope :sorted_by, ->(sort_key) {
+    order(SORT_OPTIONS.fetch(sort_key, SORT_OPTIONS["newest"]))
+  }
+
   def self.cleanup_expired!
     expired.destroy_all
   end

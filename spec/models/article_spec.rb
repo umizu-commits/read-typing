@@ -119,4 +119,58 @@ RSpec.describe Article, type: :model do
       expect(Article.exists?(future_article.id)).to be true
     end
   end
+
+  describe ".search_by_keyword" do
+    let!(:rails_article) { create(:article, :with_user, title: "Rails入門", url: "https://example.com/rails") }
+    let!(:zenn_article)  { create(:article, :with_user, title: "Zennの記事", url: "https://zenn.dev/article/1") }
+    let!(:other_article) { create(:article, :with_user, title: "Python入門", url: "https://example.com/python") }
+
+    it "titleにキーワードが含まれる記事が返ること" do
+      result = Article.search_by_keyword("Rails")
+      expect(result).to include(rails_article)
+      expect(result).not_to include(zenn_article)
+    end
+
+    it "urlにキーワードが含まれる記事が返ること" do
+      result = Article.search_by_keyword("zenn")
+      expect(result).to include(zenn_article)
+      expect(result).not_to include(rails_article)
+    end
+
+    it "キーワードが大文字でも一致すること" do
+      result = Article.search_by_keyword("RAILS")
+      expect(result).to include(rails_article)
+    end
+
+    it "キーワードが一致しない記事は返らないこと" do
+      result = Article.search_by_keyword("Java")
+      expect(result).to be_empty
+    end
+  end
+
+  describe ".sorted_by" do
+    let!(:apple_article)  { travel_to(3.days.ago) { create(:article, :with_user, title: "Apple") } }
+    let!(:banana_article) { travel_to(2.days.ago) { create(:article, :with_user, title: "Banana") } }
+    let!(:cherry_article) { travel_to(1.day.ago)  { create(:article, :with_user, title: "Cherry") } }
+
+    it '"newest" を指定すると保存日時の新しい順に返ること' do
+      expect(Article.sorted_by("newest").to_a).to eq [ cherry_article, banana_article, apple_article ]
+    end
+
+    it '"oldest" を指定すると保存日時の古い順に返ること' do
+      expect(Article.sorted_by("oldest").to_a).to eq [ apple_article, banana_article, cherry_article ]
+    end
+
+    it '"title_asc" を指定するとタイトルの昇順に返ること' do
+      expect(Article.sorted_by("title_asc").to_a).to eq [ apple_article, banana_article, cherry_article ]
+    end
+
+    it '"title_desc" を指定するとタイトルの降順に返ること' do
+      expect(Article.sorted_by("title_desc").to_a).to eq [ cherry_article, banana_article, apple_article ]
+    end
+
+    it '不正なキーを指定すると新しい順（デフォルト）に返ること' do
+      expect(Article.sorted_by("invalid").to_a).to eq [ cherry_article, banana_article, apple_article ]
+    end
+  end
 end
