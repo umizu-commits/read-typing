@@ -30,6 +30,11 @@ class ArticlesController < ApplicationController
     @current_tag = params[:tag].to_s
   end
 
+  def show
+    @article = Article.find_by!(id: params[:id])
+    authorize @article
+  end
+
   def destroy
     @article = Article.find(params[:id])
     authorize @article # ArticlePolicy#destroy? を呼ぶ（他人の記事なら弾く）
