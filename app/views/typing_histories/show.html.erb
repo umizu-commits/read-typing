@@ -17,18 +17,6 @@
     <% end %>
   </div>
 
-  <%# フラッシュメッセージ %>
-  <% if notice.present? %>
-    <div class="mb-4 rounded-lg bg-green-100 px-4 py-3 text-sm text-green-700">
-      <%= notice %>
-    </div>
-  <% end %>
-  <% if alert.present? %>
-    <div class="mb-4 rounded-lg bg-red-100 px-4 py-3 text-sm text-red-700">
-      <%= alert %>
-    </div>
-  <% end %>
-
   <%# スコアカード（4カード横並び、Result画面と統一） %>
   <div class="grid grid-cols-4 gap-3 mb-6">
 
