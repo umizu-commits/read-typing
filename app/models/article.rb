@@ -6,6 +6,7 @@ class Article < ApplicationRecord
   has_many :typing_results, dependent: :nullify
   has_many :article_tags, dependent: :destroy
   has_many :tags, through: :article_tags
+  has_many :favorites, dependent: :destroy
 
   enum :source_type, { url: "url", text: "text" }
   enum :category, { tech: "tech", english: "english", other: "other" }

@@ -23,7 +23,11 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :articles, only: [ :index, :create, :destroy ]
+  resources :articles, only: [ :index, :create, :destroy ] do
+    member do
+      post :favorite
+    end
+  end
 
   get "/terms", to: "static_pages#terms"
   get "/privacy", to: "static_pages#privacy"
