@@ -1,0 +1,93 @@
+<%# 指の色クラスを変数として定義 %>
+<% lp = "bg-red-200"    # 左小指 %>
+<% lr = "bg-orange-200" # 左薬指 %>
+<% lm = "bg-yellow-200" # 左中指 %>
+<% li = "bg-green-200"  # 左人差し指 %>
+<% ri = "bg-blue-200"   # 右人差し指 %>
+<% rm = "bg-purple-200" # 右中指 %>
+<% rr = "bg-violet-200" # 右薬指 %>
+<% rp = "bg-pink-200"   # 右小指 %>
+<% th = "bg-gray-200"   # 親指（スペース） %>
+
+<% key_style = "flex items-center justify-center h-[45px] rounded text-base font-bold text-gray-700 border border-gray-300 select-none overflow-hidden" %>
+
+<div data-typing-target="keyboard" class="flex flex-col gap-1 w-full">
+
+  <%# 数字行 %>
+  <div class="flex gap-1">
+    <div data-key="`"         style="flex:1"   class="<%= key_style %> <%= lp %>">`</div>
+    <div data-key="1"         style="flex:1"   class="<%= key_style %> <%= lp %>">1</div>
+    <div data-key="2"         style="flex:1"   class="<%= key_style %> <%= lr %>">2</div>
+    <div data-key="3"         style="flex:1"   class="<%= key_style %> <%= lm %>">3</div>
+    <div data-key="4"         style="flex:1"   class="<%= key_style %> <%= li %>">4</div>
+    <div data-key="5"         style="flex:1"   class="<%= key_style %> <%= li %>">5</div>
+    <div data-key="6"         style="flex:1"   class="<%= key_style %> <%= ri %>">6</div>
+    <div data-key="7"         style="flex:1"   class="<%= key_style %> <%= ri %>">7</div>
+    <div data-key="8"         style="flex:1"   class="<%= key_style %> <%= rm %>">8</div>
+    <div data-key="9"         style="flex:1"   class="<%= key_style %> <%= rr %>">9</div>
+    <div data-key="0"         style="flex:1"   class="<%= key_style %> <%= rp %>">0</div>
+    <div data-key="-"         style="flex:1"   class="<%= key_style %> <%= rp %>">-</div>
+    <div data-key="="         style="flex:1"   class="<%= key_style %> <%= rp %>">=</div>
+    <div data-key="Backspace" style="flex:2"   class="<%= key_style %> <%= rp %>">⌫</div>
+  </div>
+
+  <%# QWERTY行 %>
+  <div class="flex gap-1">
+    <div data-key="Tab"  style="flex:1.5" class="<%= key_style %> <%= lp %>">Tab</div>
+    <div data-key="q"    style="flex:1"   class="<%= key_style %> <%= lp %>">Q</div>
+    <div data-key="w"    style="flex:1"   class="<%= key_style %> <%= lr %>">W</div>
+    <div data-key="e"    style="flex:1"   class="<%= key_style %> <%= lm %>">E</div>
+    <div data-key="r"    style="flex:1"   class="<%= key_style %> <%= li %>">R</div>
+    <div data-key="t"    style="flex:1"   class="<%= key_style %> <%= li %>">T</div>
+    <div data-key="y"    style="flex:1"   class="<%= key_style %> <%= ri %>">Y</div>
+    <div data-key="u"    style="flex:1"   class="<%= key_style %> <%= ri %>">U</div>
+    <div data-key="i"    style="flex:1"   class="<%= key_style %> <%= rm %>">I</div>
+    <div data-key="o"    style="flex:1"   class="<%= key_style %> <%= rr %>">O</div>
+    <div data-key="p"    style="flex:1"   class="<%= key_style %> <%= rp %>">P</div>
+    <div data-key="["    style="flex:1"   class="<%= key_style %> <%= rp %>">[</div>
+    <div data-key="]"    style="flex:1"   class="<%= key_style %> <%= rp %>">]</div>
+    <div data-key="\\"   style="flex:1.5" class="<%= key_style %> <%= rp %>">\</div>
+  </div>
+
+  <%# ホーム行 %>
+  <div class="flex gap-1">
+    <div data-key="CapsLock" style="flex:1.75" class="<%= key_style %> <%= lp %>">Caps</div>
+    <div data-key="a"        style="flex:1"    class="<%= key_style %> <%= lp %>">A</div>
+    <div data-key="s"        style="flex:1"    class="<%= key_style %> <%= lr %>">S</div>
+    <div data-key="d"        style="flex:1"    class="<%= key_style %> <%= lm %>">D</div>
+    <div data-key="f"        style="flex:1"    class="<%= key_style %> <%= li %>">F</div>
+    <div data-key="g"        style="flex:1"    class="<%= key_style %> <%= li %>">G</div>
+    <div data-key="h"        style="flex:1"    class="<%= key_style %> <%= ri %>">H</div>
+    <div data-key="j"        style="flex:1"    class="<%= key_style %> <%= ri %>">J</div>
+    <div data-key="k"        style="flex:1"    class="<%= key_style %> <%= rm %>">K</div>
+    <div data-key="l"        style="flex:1"    class="<%= key_style %> <%= rr %>">L</div>
+    <div data-key=";"        style="flex:1"    class="<%= key_style %> <%= rp %>">;</div>
+    <div data-key="'"        style="flex:1"    class="<%= key_style %> <%= rp %>">'</div>
+    <div data-key="Enter"    style="flex:2.25" class="<%= key_style %> <%= rp %>">Enter</div>
+  </div>
+
+  <%# ZXCV行 %>
+  <div class="flex gap-1">
+    <div data-key="Shift"      style="flex:2.25" class="<%= key_style %> <%= lp %>">Shift</div>
+    <div data-key="z"          style="flex:1"    class="<%= key_style %> <%= lp %>">Z</div>
+    <div data-key="x"          style="flex:1"    class="<%= key_style %> <%= lr %>">X</div>
+    <div data-key="c"          style="flex:1"    class="<%= key_style %> <%= lm %>">C</div>
+    <div data-key="v"          style="flex:1"    class="<%= key_style %> <%= li %>">V</div>
+    <div data-key="b"          style="flex:1"    class="<%= key_style %> <%= li %>">B</div>
+    <div data-key="n"          style="flex:1"    class="<%= key_style %> <%= ri %>">N</div>
+    <div data-key="m"          style="flex:1"    class="<%= key_style %> <%= ri %>">M</div>
+    <div data-key=","          style="flex:1"    class="<%= key_style %> <%= rm %>">,</div>
+    <div data-key="."          style="flex:1"    class="<%= key_style %> <%= rr %>">.</div>
+    <div data-key="/"          style="flex:1"    class="<%= key_style %> <%= rp %>">/</div>
+    <div data-key="ShiftRight" style="flex:2.75" class="<%= key_style %> <%= rp %>">Shift</div>
+  </div>
+
+  <%# スペース行 %>
+  <div class="flex gap-1">
+    <div data-key="Control"      style="flex:1.5" class="<%= key_style %> <%= lp %>">Ctrl</div>
+    <div data-key="Alt"          style="flex:1.5" class="<%= key_style %> <%= lp %>">Alt</div>
+    <div data-key=" "            style="flex:7"   class="<%= key_style %> <%= th %>">Space</div>
+    <div data-key="AltRight"     style="flex:1.5" class="<%= key_style %> <%= rp %>">Alt</div>
+    <div data-key="ControlRight" style="flex:1.5" class="<%= key_style %> <%= rp %>">Ctrl</div>
+  </div>
+</div>

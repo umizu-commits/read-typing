@@ -11,7 +11,7 @@
 <% end %>
 
 <div data-controller="typing" class="h-[calc(100vh-112px)] overflow-hidden py-3 -mr-5">
-  <div class="grid h-full grid-cols-[1fr_320px] gap-6 overflow-hidden">
+  <div class="grid h-full grid-cols-[1fr_320px] grid-rows-[1fr_auto] gap-6 overflow-hidden">
     <section class="relative overflow-hidden rounded-xl border border-gray-200 bg-white p-5 shadow-sm flex flex-col gap-3">
 
       <%#  入力ウィンドウ %>
@@ -43,8 +43,9 @@
         spellcheck="false"></textarea>
     </section>
 
+
     <%# 右側エリア %>
-    <aside class="flex h-full flex-col items-end justify-between overflow-hidden">
+    <aside class="row-span-2 flex h-full flex-col items-end justify-between overflow-hidden">
 
       <%# 上部グループ: 情報カード（タイトル + タイマー + 進捗） %>
       <div class="flex flex-col gap-3 w-[290px]">
@@ -89,6 +90,10 @@
         </div>
       </div>
 
+      <%# キーボードビジュアライザー %>
+      <div class="w-[290px] rounded-xl bg-gray-50 border border-gray-200 p-3 flex flex-col gap-2">
+      </div>
+
       <%# 操作ボタングループ %>
       <div class="w-[290px] rounded-xl bg-gray-50 border border-gray-200 p-3 flex flex-col gap-2">
         <button
@@ -106,5 +111,9 @@
         </button>
       </div>
     </aside>
+
+    <div class="rounded-xl bg-white border border-gray-200 p-4 shadow-sm overflow-hidden">
+      <%= render 'typing/keyboard' %>
+    </div>
   </div>
 </div>
