@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["text", "input","hint" ,"timer", "typedWindow", "progressBar", "progressText", "totalText", "title","progressPercent"]
+  static targets = ["text", "input","hint" ,"timer", "typedWindow", "progressBar", "progressText", "totalText", "title","progressPercent", "keyboard"]
 
   connect() {
     const text = sessionStorage.getItem("typing_text")
@@ -70,6 +70,25 @@ export default class extends Controller {
 
   // キーが押されたときの処理
   handleKeydown(event) {
+    const codeToKey = {
+      "KeyA":"a","KeyB":"b","KeyC":"c","KeyD":"d","KeyE":"e","KeyF":"f",
+      "KeyG":"g","KeyH":"h","KeyI":"i","KeyJ":"j","KeyK":"k","KeyL":"l",
+      "KeyM":"m","KeyN":"n","KeyO":"o","KeyP":"p","KeyQ":"q","KeyR":"r",
+      "KeyS":"s","KeyT":"t","KeyU":"u","KeyV":"v","KeyW":"w","KeyX":"x",
+      "KeyY":"y","KeyZ":"z",
+      "Digit0":"0","Digit1":"1","Digit2":"2","Digit3":"3","Digit4":"4",
+      "Digit5":"5","Digit6":"6","Digit7":"7","Digit8":"8","Digit9":"9",
+      "Minus":"-","Equal":"=","BracketLeft":"[","BracketRight":"]",
+      "Backslash":"\\","Semicolon":";","Quote":"'","Comma":",",
+      "Period":".","Slash":"/","Backquote":"`","Space":" "
+    }
+
+    const keyValue = codeToKey[event.code] ?? event.key.toLowerCase()
+    const pressedKeyEl = this.keyboardTarget.querySelector(`[data-key="${keyValue}"]`)
+    if (pressedKeyEl) {
+      pressedKeyEl.classList.add('!bg-gray-500', '!text-white')
+      setTimeout(() => pressedKeyEl.classList.remove('!bg-gray-500', '!text-white'), 150)
+    }
 
     // IME変換中はすべてスキップ
     if (event.isComposing) return
@@ -172,6 +191,7 @@ export default class extends Controller {
   // 現在地にカーソルを表示する
   updateCursor() {
     this.updateProgress()
+    this.highlightNextKey()
     if (this.currentIndex >= this.chars.length) return // タイピング完了後はカーソルを表示しない
     const spans = this.textTarget.querySelectorAll("span")
     spans[this.currentIndex].className = "cursor-blink"
@@ -203,6 +223,22 @@ export default class extends Controller {
     }
   }
 
+  highlightNextKey() {
+    // 前のハイライトをすべて消す
+    this.keyboardTarget.querySelectorAll('[data-key]').forEach(el => {
+      el.classList.remove('ring-2', 'ring-gray-800', 'brightness-75')
+    })
+
+    if (this.currentIndex >= this.chars.length) return
+
+    const nextChar = this.chars[this.currentIndex]
+    const keyValue = nextChar.toLowerCase()
+    const keyEl = this.keyboardTarget.querySelector(`[data-key="${keyValue}"]`)
+
+    if (keyEl) {
+      keyEl.classList.add('ring-2', 'ring-gray-800', 'brightness-75')
+    }
+  }
 
   handleCompositionStart() {
     if (this.isStarted) return
@@ -356,5 +392,5 @@ export default class extends Controller {
     if (this.hasProgressPercentTarget) {
       this.progressPercentTarget.textContent = percent
     }
-  } 
+  }
 }
