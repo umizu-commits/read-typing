@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-    static targets = ["accuracy", "cpm", "wpm", "missCount", "elapsedTime", "saveSuccess", "saveFailed", "saveSkipped", "saveButton", "completedMessage", "endedMessage", "articleTitle", "articleTitleText", "copySuccess"]
+    static targets = ["accuracy", "cpm", "wpm", "missCount", "elapsedTime", "saveSuccess", "saveFailed", "saveSkipped", "saveButton", "completedMessage", "endedMessage", "articleTitle", "articleTitleText", "copySuccess", "achievementBanners"]
     static values = { appUrl: String }
 
     connect() {
@@ -43,11 +43,12 @@ export default class extends Controller {
             this.postResult(body, (data) => {
                 if (data.status === "saved") {
                     this.saveSuccessTarget.classList.remove("hidden")
+                    if (data.achievements?.length > 0) this.showAchievements(data.achievements)
                 } else if (data.status === "skipped") {
                     this.saveSkippedTarget.classList.remove("hidden")
                 } else {
                     this.saveFailedTarget.classList.remove("hidden")
-                } 
+                }
             })
 
         } else if (result.reason === "ended") {
@@ -129,6 +130,34 @@ export default class extends Controller {
         const text = this.buildShareText()
         const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
         window.open(url, "_blank", "noopener")
+        this.recordShareAchievement()
+    }
+
+    recordShareAchievement() {
+        const isLoggedIn = document.querySelector('meta[name="user-signed-in"]')?.content === "true"
+        if (!isLoggedIn) return
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content
+        fetch("/typing/results/share_achievement", {
+            method: "POST",
+            headers: { "X-CSRF-Token": csrfToken }
+        }).catch(() => {})
+    }
+
+    showAchievements(achievements) {
+        const container = this.achievementBannersTarget
+        achievements.forEach(a => {
+            const el = document.createElement("div")
+            el.className = "flex justify-center"
+            el.innerHTML = `
+                <div class="inline-flex items-center gap-2 rounded-full bg-gray-800 border border-green-700 px-4 py-2 text-sm font-bold text-green-400">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                    </svg>
+                    実績解除: ${a.name}
+                </div>
+            `
+            container.appendChild(el)
+        })
     }
 
     copyResult() {
