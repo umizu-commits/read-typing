@@ -1,7 +1,9 @@
 import { Controller } from "@hotwired/stimulus"
 
+const SPAN_BASE = "typing-char"
+
 export default class extends Controller {
-  static targets = ["text", "input","hint" ,"timer", "typedWindow", "progressBar", "progressText", "totalText", "title","progressPercent", "keyboard", "skipModeButton"]
+  static targets = ["text", "input","hint" ,"timer", "typedWindow", "progressBar", "progressText", "totalText", "title","progressPercent", "keyboard", "skipModeButton", "missFlash"]
 
   connect() {
     const text = sessionStorage.getItem("typing_text")
@@ -32,6 +34,7 @@ export default class extends Controller {
     this.chars.forEach(char => {
       const span = document.createElement("span")
       span.textContent = char // textContent は HTML として解釈しない
+      span.className = SPAN_BASE
       fragment.appendChild(span)
     })
 
@@ -85,14 +88,19 @@ export default class extends Controller {
       "Digit5":"5","Digit6":"6","Digit7":"7","Digit8":"8","Digit9":"9",
       "Minus":"-","Equal":"=","BracketLeft":"[","BracketRight":"]",
       "Backslash":"\\","Semicolon":";","Quote":"'","Comma":",",
-      "Period":".","Slash":"/","Backquote":"`","Space":" "
+      "Period":".","Slash":"/","Backquote":"`","Space":" ",
+      "Enter":"Enter","ShiftLeft":"Shift","ShiftRight":"ShiftRight"
     }
 
     const keyValue = codeToKey[event.code] ?? event.key.toLowerCase()
     const pressedKeyEl = this.keyboardTarget.querySelector(`[data-key="${keyValue}"]`)
     if (pressedKeyEl) {
-      pressedKeyEl.classList.add('!bg-gray-500', '!text-white')
-      setTimeout(() => pressedKeyEl.classList.remove('!bg-gray-500', '!text-white'), 150)
+      pressedKeyEl.classList.add('!bg-gray-500', '!text-white', '!scale-90')
+      // Shiftは長押し中ハイライトを維持し、keyupで解除する
+      const isShift = event.code === "ShiftLeft" || event.code === "ShiftRight"
+      if (!isShift) {
+        setTimeout(() => pressedKeyEl.classList.remove('!bg-gray-500', '!text-white', '!scale-90'), 120)
+      }
     }
 
     // IME変換中はすべてスキップ
@@ -125,7 +133,7 @@ export default class extends Controller {
           this.hintTarget.classList.add("hidden")
         }
         const spans = this.textTarget.querySelectorAll("span")
-        spans[this.currentIndex].className = "text-gray-300 line-through"
+        spans[this.currentIndex].className = `${SPAN_BASE} text-gray-300 line-through`
         this.skippedCount++
         this.currentIndex++
         this.skipNonTypableChars()
@@ -160,7 +168,7 @@ export default class extends Controller {
     // 入力されたキーが期待される文字と一致する場合、次の文字に進む
     const spans = this.textTarget.querySelectorAll("span")
     if (key === expectedChar) {
-      spans[this.currentIndex].className = "text-gray-400"
+      spans[this.currentIndex].className = `${SPAN_BASE} text-gray-400`
       this.currentIndex++
       this.correctCount++
       this.skipNonTypableChars()
@@ -174,7 +182,10 @@ export default class extends Controller {
       }
     } else {
       this.missCount++ // ミスをカウントする
-      spans[this.currentIndex].className = "text-red-500 underline decoration-red-300 decoration-2"
+      const missSpan = spans[this.currentIndex]
+      missSpan.className = `${SPAN_BASE} text-red-500 underline decoration-red-300 decoration-2`
+      this.shakeChar(missSpan)
+      this.flashMiss()
     }
     this.typedText += key // 入力されたキーをTypedTextに追記
     this.typedWindowTarget.textContent = this.typedText // 入力ウィンドウに反映
@@ -193,7 +204,7 @@ export default class extends Controller {
     this.isCompleted = false
 
     this.textTarget.querySelectorAll("span").forEach(span => {
-      span.className = ""
+      span.className = SPAN_BASE
     })
 
     this.skipNonTypableChars()
@@ -248,7 +259,7 @@ export default class extends Controller {
     this.highlightNextKey()
     if (this.currentIndex >= this.chars.length) return // タイピング完了後はカーソルを表示しない
     const spans = this.textTarget.querySelectorAll("span")
-    spans[this.currentIndex].className = "cursor-blink"
+    spans[this.currentIndex].className = `${SPAN_BASE} cursor-blink`
 
     // textareaの位置を更新する処理
     const rect = spans[this.currentIndex].getBoundingClientRect()
@@ -325,7 +336,7 @@ export default class extends Controller {
       }
 
       if (char === this.chars[this.currentIndex]) {
-        spans[this.currentIndex].className = "text-gray-400"
+        spans[this.currentIndex].className = `${SPAN_BASE} text-gray-400`
         this.currentIndex++
         this.correctCount++
         this.skipNonTypableChars()
@@ -339,7 +350,10 @@ export default class extends Controller {
         }
       } else {
         this.missCount++
-        spans[this.currentIndex].className = "text-red-500 underline decoration-red-300 decoration-2"
+        const missSpan = spans[this.currentIndex]
+        missSpan.className = `${SPAN_BASE} text-red-500 underline decoration-red-300 decoration-2`
+        this.shakeChar(missSpan)
+        this.flashMiss()
       }
     }
     this.inputTarget.value = "" // 1回の変換確定後にtextareaをクリアすることで、次の変換開始時にカーソルが先頭に戻る
@@ -435,6 +449,38 @@ export default class extends Controller {
     this.stopTimer()
     this.saveResult("ended")
     window.location.href = "/typing/result"
+  }
+
+  // Shiftキーの離鍵を検知してハイライトを解除する
+  handleKeyup(event) {
+    if (event.code !== "ShiftLeft" && event.code !== "ShiftRight") return
+    const keyValue = event.code === "ShiftLeft" ? "Shift" : "ShiftRight"
+    const keyEl = this.keyboardTarget.querySelector(`[data-key="${keyValue}"]`)
+    if (keyEl) {
+      keyEl.classList.remove('!bg-gray-500', '!text-white', '!scale-90')
+    }
+  }
+
+  // ミス文字を一瞬シェイクさせる
+  shakeChar(span) {
+    span.classList.remove('char-shake')
+    void span.offsetWidth // アニメーションを再生し直すための強制リフロー
+    span.classList.add('char-shake')
+    clearTimeout(this._shakeTimer)
+    this._shakeTimer = setTimeout(() => span.classList.remove('char-shake'), 220)
+  }
+
+  // ミス時に画面全体を一瞬だけ赤くフラッシュさせる
+  flashMiss() {
+    if (!this.hasMissFlashTarget) return
+    const flash = this.missFlashTarget
+    flash.classList.remove('opacity-0')
+    flash.classList.add('opacity-100')
+    clearTimeout(this._missFlashTimer)
+    this._missFlashTimer = setTimeout(() => {
+      flash.classList.remove('opacity-100')
+      flash.classList.add('opacity-0')
+    }, 100)
   }
 
   // 進捗

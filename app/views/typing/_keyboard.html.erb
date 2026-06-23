@@ -9,7 +9,7 @@
 <% rp = "bg-pink-900"   # 右小指 %>
 <% th = "bg-gray-700"   # 親指（スペース） %>
 
-<% key_style = "flex items-center justify-center h-[45px] rounded text-base font-bold text-gray-200 border border-gray-700 select-none overflow-hidden" %>
+<% key_style = "flex items-center justify-center h-[45px] rounded text-base font-bold text-gray-200 border border-gray-700 select-none overflow-hidden transition-transform duration-75" %>
 
 <div data-typing-target="keyboard" class="flex flex-col gap-1 w-full">
 
@@ -55,10 +55,10 @@
     <div data-key="a"        style="flex:1"    class="<%= key_style %> <%= lp %>">A</div>
     <div data-key="s"        style="flex:1"    class="<%= key_style %> <%= lr %>">S</div>
     <div data-key="d"        style="flex:1"    class="<%= key_style %> <%= lm %>">D</div>
-    <div data-key="f"        style="flex:1"    class="<%= key_style %> <%= li %>">F</div>
+    <div data-key="f"        style="flex:1"    class="<%= key_style %> <%= li %> relative">F<span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-gray-300/60 pointer-events-none"></span></div>
     <div data-key="g"        style="flex:1"    class="<%= key_style %> <%= li %>">G</div>
     <div data-key="h"        style="flex:1"    class="<%= key_style %> <%= ri %>">H</div>
-    <div data-key="j"        style="flex:1"    class="<%= key_style %> <%= ri %>">J</div>
+    <div data-key="j"        style="flex:1"    class="<%= key_style %> <%= ri %> relative">J<span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-gray-300/60 pointer-events-none"></span></div>
     <div data-key="k"        style="flex:1"    class="<%= key_style %> <%= rm %>">K</div>
     <div data-key="l"        style="flex:1"    class="<%= key_style %> <%= rr %>">L</div>
     <div data-key=";"        style="flex:1"    class="<%= key_style %> <%= rp %>">;</div>
