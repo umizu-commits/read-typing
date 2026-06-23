@@ -1,0 +1,27 @@
+<div class="flex justify-center pt-16">
+  <div class="bg-gray-900 border border-gray-800 rounded-xl shadow-2xl p-8 w-full max-w-md">
+    <h1 class="text-xl font-bold text-gray-100 mb-2">退会の確認</h1>
+    <p class="text-sm text-gray-400 mb-6">
+      退会すると、保存記事・タイピング履歴などすべてのデータが削除されます。この操作は取り消せません。
+    </p>
+
+    <div class="bg-gray-800 rounded-lg px-4 py-3 text-sm text-gray-400 mb-6 space-y-1">
+      <p>削除されるデータ：</p>
+      <ul class="list-disc list-inside space-y-0.5 mt-1">
+        <li>保存した記事</li>
+        <li>タイピング履歴</li>
+        <li>お気に入り</li>
+        <li>アカウント情報</li>
+      </ul>
+    </div>
+
+    <%= button_to user_registration_path,
+          method: :delete,
+          class: "w-full bg-red-700 hover:bg-red-800 text-white font-bold py-3 rounded-lg text-sm transition-colors mb-3" do %>
+      退会する
+    <% end %>
+
+    <%= link_to "キャンセル", root_path,
+          class: "block text-center text-sm text-gray-500 hover:text-gray-300 transition-colors" %>
+  </div>
+</div>
