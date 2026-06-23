@@ -114,5 +114,23 @@ RSpec.describe ArticleTextForm do
         expect(form.article.expires_at).to be_within(1.minute).of(7.days.from_now)
       end
     end
+
+    context "tag_namesを渡した場合" do
+      subject(:form) { described_class.new(body: valid_body, title: title, user: nil, tag_names: "Rails, Ruby") }
+
+      it "タグが記事に紐づく" do
+        form.save
+        expect(form.article.tags.map(&:name)).to match_array([ "Rails", "Ruby" ])
+      end
+    end
+
+    context "tag_namesが空文字の場合" do
+      subject(:form) { described_class.new(body: valid_body, title: title, user: nil, tag_names: "") }
+
+      it "タグなしで保存される" do
+        form.save
+        expect(form.article.tags).to be_empty
+      end
+    end
   end
 end
