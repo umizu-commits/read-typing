@@ -37,10 +37,14 @@
 
       <textarea
         data-typing-target="input"
-        data-action="keydown->typing#handleKeydown compositionstart->typing#handleCompositionStart compositionupdate->typing#handleCompositionUpdate compositionend->typing#handleCompositionEnd"
+        data-action="keydown->typing#handleKeydown keyup->typing#handleKeyup compositionstart->typing#handleCompositionStart compositionupdate->typing#handleCompositionUpdate compositionend->typing#handleCompositionEnd"
         class="fixed opacity-0 w-full h-px overflow-hidden resize-none"
         autocomplete="off"
         spellcheck="false"></textarea>
+
+      <%# ミス時のフラッシュオーバーレイ %>
+      <div data-typing-target="missFlash"
+           class="pointer-events-none absolute inset-0 bg-red-500/15 opacity-0 transition-opacity duration-150"></div>
     </section>
 
     <%# 右側エリア %>
@@ -87,10 +91,6 @@
             <span class="font-mono text-2xl font-bold text-gray-500">%</span>
           </div>
         </div>
-      </div>
-
-      <%# キーボードビジュアライザー %>
-      <div class="w-[290px] rounded-xl bg-gray-800 border border-gray-700 p-3 flex flex-col gap-2">
       </div>
 
       <%# 操作ボタングループ %>

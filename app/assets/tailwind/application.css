@@ -25,3 +25,19 @@ select:-webkit-autofill:focus {
     border-radius: 0.25rem;
     animation: blink 1s step-start infinite;
 }
+
+.typing-char {
+    transition: color 150ms ease-out;
+}
+
+@keyframes char-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    50% { transform: translateX(2px); }
+    75% { transform: translateX(-2px); }
+}
+
+.char-shake {
+    display: inline-block;
+    animation: char-shake 0.2s ease-in-out;
+}
