@@ -7,10 +7,21 @@ class ArticleBodyExtractor
   MIN_BODY_LENGTH = 50
   MAX_TITLE_LENGTH = 255
 
+  # ドメインごとのサイト名サフィックスパターン（末尾マッチ）
+  SITE_SUFFIX_PATTERNS = {
+    "qiita.com"       => /\s*-\s*Qiita\z/,
+    "zenn.dev"        => /\s*\|\s*Zenn\z/,
+    "note.com"        => /\s*\|\s*note\z/,
+    "medium.com"      => /\s*[-|]\s*Medium\z/i,
+    "dev.to"          => /\s*[-|]\s*DEV Community\z/i,
+    "speakerdeck.com" => /\s*[-|]\s*Speaker Deck\z/i
+  }.freeze
+
   Result = Struct.new(:success?, :body, :title, :error_message, keyword_init: true)
 
-  def initialize(html)
+  def initialize(html, url: nil)
     @html = html
+    @url  = url
   end
 
   def call
@@ -52,6 +63,17 @@ class ArticleBodyExtractor
     title = doc.at_css('meta[property="og:title"]')&.attr("content")&.strip
     title = doc.at_css("title")&.text&.strip if title.blank?
     return nil if title.blank?
+    title = strip_site_suffix(title)
     title.length > MAX_TITLE_LENGTH ? title[0, MAX_TITLE_LENGTH] : title
+  end
+
+  def strip_site_suffix(title)
+    return title if @url.blank?
+    host = URI.parse(@url).hostname.to_s.downcase.delete_prefix("www.")
+    pattern = SITE_SUFFIX_PATTERNS.find { |domain, _| host == domain || host.end_with?(".#{domain}") }&.last
+    return title if pattern.nil?
+    title.sub(pattern, "").strip
+  rescue URI::InvalidURIError
+    title
   end
 end

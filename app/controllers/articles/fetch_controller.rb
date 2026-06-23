@@ -7,7 +7,7 @@ module Articles
         return
       end
 
-      extract_result = ArticleBodyExtractor.new(fetch_result.html).call
+      extract_result = ArticleBodyExtractor.new(fetch_result.html, url: params[:url]).call
       unless extract_result.success?
         render json: { error: extract_result.error_message }, status: :unprocessable_entity
         return

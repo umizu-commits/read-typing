@@ -16,7 +16,7 @@ class ArticleForm
       return false
     end
 
-    extract_result = ArticleBodyExtractor.new(fetch_result.html).call
+    extract_result = ArticleBodyExtractor.new(fetch_result.html, url: url).call
     unless extract_result.success?
       errors.add(:base, extract_result.error_message)
       return false
