@@ -8,7 +8,11 @@ class ArticlesController < ApplicationController
     end
 
     if form.save
-      redirect_to typing_path(article_id: form.article.id)
+      if params[:save_only] == "true"
+        redirect_to articles_path, notice: "記事を保存しました"
+      else
+        redirect_to typing_path(article_id: form.article.id)
+      end
     else
       redirect_to root_path, alert: form.errors.full_messages.first
     end

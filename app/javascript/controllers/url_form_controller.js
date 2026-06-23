@@ -70,6 +70,40 @@ export default class extends Controller {
   }
 
 
+  async saveOnlyUrl(event) {
+    this.urlErrorTarget.classList.add("hidden")
+
+    const url = this.urlInputTarget.value.trim()
+    if (url === "") { this.showUrlError("URLを入力してください"); return }
+    try {
+      const parsed = new URL(url)
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+        this.showUrlError("正しいURL形式で入力してください（例：https://example.com）"); return
+      }
+    } catch {
+      this.showUrlError("正しいURL形式で入力してください（例：https://example.com）"); return
+    }
+
+    const formEl = event.target.closest("form")
+    const formData = new FormData(formEl)
+    formData.append("save_only", "true")
+
+    const response = await fetch("/articles", {
+      method: "POST",
+      body: formData,
+      redirect: "follow"
+    })
+
+    if (response.status === 429) {
+      this.showUrlError("リクエストが多すぎます。しばらく時間をおいてから再度お試しください。")
+      return
+    }
+
+    if (response.redirected) {
+      window.location.href = response.url
+    }
+  }
+
   showUrlError(message) {
     this.urlErrorTarget.textContent = message   // ← message を表示する
     this.urlErrorTarget.classList.remove("hidden")
