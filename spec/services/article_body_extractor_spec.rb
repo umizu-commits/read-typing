@@ -44,12 +44,12 @@ RSpec.describe ArticleBodyExtractor do
       let(:body_text) { "a" * 50 }
 
       {
-        "qiita.com"       => ["記事タイトル - Qiita",        "記事タイトル"],
-        "zenn.dev"        => ["記事タイトル | Zenn",         "記事タイトル"],
-        "note.com"        => ["記事タイトル | note",         "記事タイトル"],
-        "medium.com"      => ["記事タイトル - Medium",       "記事タイトル"],
-        "dev.to"          => ["記事タイトル | DEV Community", "記事タイトル"],
-        "speakerdeck.com" => ["スライドタイトル | Speaker Deck", "スライドタイトル"]
+        "qiita.com"       => [ "記事タイトル - Qiita",        "記事タイトル" ],
+        "zenn.dev"        => [ "記事タイトル | Zenn",         "記事タイトル" ],
+        "note.com"        => [ "記事タイトル | note",         "記事タイトル" ],
+        "medium.com"      => [ "記事タイトル - Medium",       "記事タイトル" ],
+        "dev.to"          => [ "記事タイトル | DEV Community", "記事タイトル" ],
+        "speakerdeck.com" => [ "スライドタイトル | Speaker Deck", "スライドタイトル" ]
       }.each do |domain, (raw_title, expected)|
         it "#{domain} のサフィックスを除去する" do
           html = build_html(og_title: raw_title, body: body_text)
