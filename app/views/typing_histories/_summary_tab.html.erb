@@ -148,30 +148,9 @@
         直近30件
       </span>
     </div>
-    <%= line_chart chart_data_typing_histories_path(format: :json),
-          height: "250px",
-          colors: ["#22c55e"],
-          curve: false,
-          points: true,
-          legend: false,
-          library: {
-            devicePixelRatio: 2,
-            scales: {
-              x: {
-                grid: { color: "rgba(255,255,255,0.07)" },
-                ticks: {
-                  color: "#9ca3af",
-                  maxTicksLimit: 8,
-                  maxRotation: 30,
-                  minRotation: 30,
-                  font: { size: 12 }
-                }
-              },
-              y: {
-                grid: { color: "rgba(255,255,255,0.07)" },
-                ticks: { color: "#9ca3af", font: { size: 12 } }
-              }
-            }
-          } %>
+    <div style="height:250px; position:relative;">
+      <canvas data-controller="chart"
+              data-chart-data-value="<%= @chart_data.to_json %>"></canvas>
+    </div>
   </div>
 <% end %>

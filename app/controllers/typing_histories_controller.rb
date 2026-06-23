@@ -17,6 +17,10 @@ class TypingHistoriesController < ApplicationController
       @cpm_diff = @latest_result.cpm - @prev_result.cpm
       @accuracy_diff = @latest_result.accuracy - @prev_result.accuracy
     end
+
+    # グラフ用データをインラインで生成（別途AJAXリクエスト不要）
+    chart_results = @all_typing_results.order(created_at: :desc).limit(30).pluck(:created_at, :cpm).reverse
+    @chart_data = chart_results.map { |created_at, cpm| [ created_at.strftime("%-m/%-d"), cpm ] }
   end
 
   def show
