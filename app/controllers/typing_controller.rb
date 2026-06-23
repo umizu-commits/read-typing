@@ -22,6 +22,7 @@ class TypingController < ApplicationController
 
       @typing_text = article.body
       @article_title = article.title
+      @article_id = article.id
     end
 
     def result
@@ -48,6 +49,6 @@ class TypingController < ApplicationController
 
     private
     def typing_result_params
-        params.permit(:wpm, :cpm, :accuracy, :miss_count, :elapsed_time, :article_text, :article_title, :correct_count)
+        params.permit(:wpm, :cpm, :accuracy, :miss_count, :elapsed_time, :article_text, :article_title, :correct_count, :article_id)
     end
 end

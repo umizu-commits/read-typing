@@ -31,15 +31,15 @@ export default class extends Controller {
         this.elapsedTimeTarget.textContent = this.formatTime(result.elapsedSeconds)
 
         const articleText = sessionStorage.getItem("typing_text")
-        
         const articleTitle = sessionStorage.getItem("article_title") || ""
+        const articleId = sessionStorage.getItem("article_id") || null
         if (articleTitle) {
             this.articleTitleTarget.classList.remove("hidden")
             this.articleTitleTextTarget.textContent = articleTitle
         }
 
         if (result.reason === "completed") {
-            const body = { wpm: result.wpm, cpm: result.cpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText, article_title: articleTitle, correct_count: result.correctCount }
+            const body = { wpm: result.wpm, cpm: result.cpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText, article_title: articleTitle, correct_count: result.correctCount, article_id: articleId }
             this.postResult(body, (data) => {
                 if (data.status === "saved") {
                     this.saveSuccessTarget.classList.remove("hidden")
@@ -57,7 +57,7 @@ export default class extends Controller {
             if (isLoggedIn) {
               this.saveButtonTarget.classList.remove("hidden") // 保存ボタンを表示
             } else {
-                const body = { wpm: result.wpm, cpm: result.cpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText, article_title: articleTitle, correct_count: result.correctCount }
+                const body = { wpm: result.wpm, cpm: result.cpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText, article_title: articleTitle, correct_count: result.correctCount, article_id: articleId }
                 this.postResult(body, (data) => {
                     if (data.status === "skipped") {
                         this.saveSkippedTarget.classList.remove("hidden")
@@ -97,7 +97,8 @@ export default class extends Controller {
         const articleText = sessionStorage.getItem("typing_text")
         const articleTitle = sessionStorage.getItem("article_title") || ""
         const result = JSON.parse(sessionStorage.getItem("typing_result"))
-        const body = { wpm: result.wpm, cpm: result.cpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText, article_title: articleTitle, correct_count: result.correctCount }
+        const articleId = sessionStorage.getItem("article_id") || null
+        const body = { wpm: result.wpm, cpm: result.cpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText, article_title: articleTitle, correct_count: result.correctCount, article_id: articleId }
 
         this.postResult(body, (data) => {
             if (data.status === "saved") {
@@ -105,8 +106,8 @@ export default class extends Controller {
                 this.saveButtonTarget.classList.add("hidden")
             } else {
                 this.saveFailedTarget.classList.remove("hidden")
-            }  
-        })  
+            }
+        })
     }
 
     // sessionStorageの削除を行ってから、TOPページに遷移する
@@ -114,6 +115,7 @@ export default class extends Controller {
         sessionStorage.removeItem("typing_text")
         sessionStorage.removeItem("typing_result")
         sessionStorage.removeItem("article_title")
+        sessionStorage.removeItem("article_id")
         window.location.href = "/"
     }
 

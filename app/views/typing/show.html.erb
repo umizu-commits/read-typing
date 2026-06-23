@@ -7,6 +7,7 @@
   <script nonce="<%= content_security_policy_nonce %>">
     sessionStorage.setItem("typing_text", <%= raw @typing_text.to_json %>);
     sessionStorage.setItem("article_title", <%= raw (@article_title || "").to_json %>);
+    sessionStorage.setItem("article_id", <%= raw @article_id.to_json %>);
   </script>
 <% end %>
 
