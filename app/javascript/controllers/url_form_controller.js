@@ -4,52 +4,29 @@ export default class extends Controller {
   static targets = ["urlTab", "textTab", "urlContent", "textContent", "urlError", "urlInput"]
 
   showUrl() {
-    // 表示する
     this.urlContentTarget.classList.remove("hidden")
-    // アクティブなタブ → 青いアンダーライン + 青い文字
     this.urlTabTarget.classList.add("border-green-500", "text-green-500")
     this.urlTabTarget.classList.remove("border-transparent", "text-gray-500")
-    // 非表示にする
     this.textContentTarget.classList.add("hidden")
-    // 非アクティブなタブ → 透明アンダーライン + グレー文字
     this.textTabTarget.classList.add("border-transparent", "text-gray-500")
     this.textTabTarget.classList.remove("border-green-500", "text-green-500")
   }
 
   showText() {
-        // 表示する
     this.textContentTarget.classList.remove("hidden")
-    // アクティブなタブ → 青いアンダーライン + 青い文字
     this.textTabTarget.classList.add("border-green-500", "text-green-500")
     this.textTabTarget.classList.remove("border-transparent", "text-gray-500")
-    // 非表示にする
     this.urlContentTarget.classList.add("hidden")
-    // 非アクティブなタブ → 透明アンダーライン + グレー文字
     this.urlTabTarget.classList.add("border-transparent", "text-gray-500")
     this.urlTabTarget.classList.remove("border-green-500", "text-green-500")
   }
 
   async submitUrl(event) {
     event.preventDefault()
-    this.urlErrorTarget.classList.add("hidden") // エラーを一旦消す
+    this.urlErrorTarget.classList.add("hidden")
 
-    const url = this.urlInputTarget.value.trim()
-    if (url === "") {
-      this.showUrlError("URLを入力してください")
-      return
-    }
-    
-    try {
-      const parsed = new URL(url)
-      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-        this.showUrlError("正しいURL形式で入力してください（例：https://example.com）")
-        return
-      } 
-    } catch {
-      // new URL(url) が失敗した場合（完全に不正な文字列）
-      this.showUrlError("正しいURL形式で入力してください（例：https://example.com）")
-      return
-    }
+    const url = this.validateUrl()
+    if (!url) return
 
     const form = event.target
     const response = await fetch("/articles", {
@@ -61,28 +38,24 @@ export default class extends Controller {
     if (response.status === 429) {
       this.showUrlError("リクエストが多すぎます。しばらく時間をおいてから再度お試しください。")
       return
-    } 
+    }
 
     if (response.redirected) {
-      sessionStorage.removeItem("article_title")
-      window.location.href = response.url
+      const path = new URL(response.url).pathname
+      if (path.startsWith("/typing")) {
+        sessionStorage.removeItem("article_title")
+        window.location.href = response.url
+      } else {
+        this.showUrlError("記事の取得に失敗しました。URLを確認するか、しばらく時間をおいてから再度お試しください。")
+      }
     }
   }
-
 
   async saveOnlyUrl(event) {
     this.urlErrorTarget.classList.add("hidden")
 
-    const url = this.urlInputTarget.value.trim()
-    if (url === "") { this.showUrlError("URLを入力してください"); return }
-    try {
-      const parsed = new URL(url)
-      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-        this.showUrlError("正しいURL形式で入力してください（例：https://example.com）"); return
-      }
-    } catch {
-      this.showUrlError("正しいURL形式で入力してください（例：https://example.com）"); return
-    }
+    const url = this.validateUrl()
+    if (!url) return
 
     const formEl = event.target.closest("form")
     const formData = new FormData(formEl)
@@ -100,31 +73,21 @@ export default class extends Controller {
     }
 
     if (response.redirected) {
-      window.location.href = response.url
+      const path = new URL(response.url).pathname
+      if (path.startsWith("/articles")) {
+        window.location.href = response.url
+      } else {
+        this.showUrlError("記事の取得に失敗しました。URLを確認するか、しばらく時間をおいてから再度お試しください。")
+      }
     }
-  }
-
-  showUrlError(message) {
-    this.urlErrorTarget.textContent = message   // ← message を表示する
-    this.urlErrorTarget.classList.remove("hidden")
   }
 
   async fetchWithoutSave(event) {
     this.urlErrorTarget.classList.add("hidden")
 
-    // URL バリデーション（submitUrl と同じ）
-    const url = this.urlInputTarget.value.trim()
-    if (url === "") { this.showUrlError("URLを入力してください"); return }
-    try {
-      const parsed = new URL(url)
-      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-        this.showUrlError("正しいURL形式で入力してください（例：https://example.com）"); return
-      }
-    } catch {
-      this.showUrlError("正しいURL形式で入力してください（例：https://example.com）"); return
-    }
+    const url = this.validateUrl()
+    if (!url) return
 
-    // POST /articles/fetch へ JSON で送信
     const csrfToken = document.querySelector("meta[name='csrf-token']").content
     const response = await fetch("/articles/fetch", {
       method: "POST",
@@ -145,10 +108,34 @@ export default class extends Controller {
       return
     }
 
-    // sessionStorage に保存して /typing へ遷移
     const data = await response.json()
     sessionStorage.setItem("typing_text", data.body)
     sessionStorage.setItem("article_title", data.title || "")
     window.location.href = "/typing"
+  }
+
+  // URL の空チェック・形式チェックを行い、有効な URL 文字列を返す。無効なら null を返す。
+  validateUrl() {
+    const url = this.urlInputTarget.value.trim()
+    if (url === "") {
+      this.showUrlError("URLを入力してください")
+      return null
+    }
+    try {
+      const parsed = new URL(url)
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+        this.showUrlError("正しいURL形式で入力してください（例：https://example.com）")
+        return null
+      }
+      return url
+    } catch {
+      this.showUrlError("正しいURL形式で入力してください（例：https://example.com）")
+      return null
+    }
+  }
+
+  showUrlError(message) {
+    this.urlErrorTarget.textContent = message
+    this.urlErrorTarget.classList.remove("hidden")
   }
 }

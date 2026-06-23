@@ -1,5 +1,6 @@
 class ArticleForm
   include ActiveModel::Model
+  include TagsAttachable
 
   attr_accessor :url, :user, :category, :tag_names
 
@@ -9,6 +10,14 @@ class ArticleForm
 
   def save
     return false unless valid?
+
+    # 既存記事があれば外部フェッチをスキップして再利用する
+    existing = Article.find_by(url: url, user_id: user&.id)
+    if existing
+      @article = existing
+      attach_tags(@article)
+      return true
+    end
 
     fetch_result = ArticleHtmlFetcher.new(url).call
     unless fetch_result.success?
@@ -28,6 +37,8 @@ class ArticleForm
       return false
     end
 
+    # find_or_create_by! は SELECT→INSERT の2ステップのため、並行リクエスト時に
+    # 両方が INSERT を試みて一意制約違反になることがある。その場合は既存レコードを取得する。
     begin
       @article = Article.find_or_create_by!(url: url, user_id: user&.id) do |a|
         a.body = preprocess_result.body
@@ -58,13 +69,5 @@ class ArticleForm
     nil # ドメイン名なので OK
   rescue URI::InvalidURIError
     nil # format バリデーションに任せる
-  end
-
-  def attach_tags(article)
-    return if tag_names.blank?
-
-    names = tag_names.split(",").map(&:strip).reject(&:blank?).uniq
-    tags = names.map { |name| Tag.find_or_create_by!(name: name) }
-    article.tags = tags
   end
 end

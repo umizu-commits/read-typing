@@ -39,7 +39,7 @@ class ArticleEditForm
     return if tag_names.nil?
 
     names = tag_names.split(",").map(&:strip).reject(&:blank?).uniq
-    tags  = names.map { |name| Tag.find_or_create_by!(name: name) }
+    tags  = names.map { |name| Tag.find_or_create_by!(name: name) } # nil のときのみスキップ。空文字列は「タグを全削除」として処理する
     article.tags = tags
   end
 end
