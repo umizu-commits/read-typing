@@ -93,6 +93,15 @@
                   class="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 font-bold py-3 rounded-lg mt-2 cursor-pointer transition-colors">
             保存せずに開始する
           </button>
+          <% if user_signed_in? %>
+            <div class="text-center mt-1">
+              <button type="button"
+                      data-action="click->url-form#saveOnlyUrl"
+                      class="text-xs text-gray-500 hover:text-green-500 transition-colors">
+                保存のみ
+              </button>
+            </div>
+          <% end %>
         </form>
       </div>
 
@@ -188,6 +197,15 @@
                   class="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 font-bold py-3 rounded-lg mt-2 cursor-pointer transition-colors">
             保存せずに練習を開始する
           </button>
+          <% if user_signed_in? %>
+            <div class="text-center mt-1">
+              <button type="button"
+                      data-action="click->typing-form#saveOnly"
+                      class="text-xs text-gray-500 hover:text-green-500 transition-colors">
+                保存のみ
+              </button>
+            </div>
+          <% end %>
         </form>
       </div>
 
