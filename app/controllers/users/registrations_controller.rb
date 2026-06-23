@@ -1,6 +1,6 @@
 class Users::RegistrationsController < Devise::RegistrationsController
-  skip_before_action :require_no_authentication, only: [:cancel]
-  before_action :authenticate_user!, only: [:cancel, :destroy]
+  skip_before_action :require_no_authentication, only: [ :cancel ]
+  before_action :authenticate_user!, only: [ :cancel, :destroy ]
 
   def cancel
     # 退会確認画面
