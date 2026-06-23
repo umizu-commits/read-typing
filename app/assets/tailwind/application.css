@@ -1,13 +1,27 @@
 @import "tailwindcss";
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 1000px rgb(31 41 55) inset;
+    -webkit-text-fill-color: rgb(243 244 246);
+    transition: background-color 5000s ease-in-out 0s;
+}
+
 @keyframes blink {
-    0%, 100% { background-color: rgb(219 234 254); }  /* bg-blue-100 */
-    50% { background-color: rgb(191 219 254); }       /* bg-blue-200 */
+    0%, 100% { background-color: rgb(20 83 45); }
+    50% { background-color: rgb(22 101 52); }
 }
 
 .cursor-blink {
-    background-color: rgb(219 234 254);
-    color: rgb(37 99 235);          /* text-blue-600 */
+    background-color: rgb(20 83 45);
+    color: rgb(22 163 74);
     border-radius: 0.25rem;
     animation: blink 1s step-start infinite;
 }

@@ -1,28 +1,28 @@
 <% content_for :title, "パスワード再設定 | ReadTyping" %>
 
 <div class="flex items-center justify-center flex-1">
-  <div class="w-[400px] rounded-xl bg-white p-8 shadow-sm space-y-6">
-    <h1 class="text-xl font-bold text-gray-800 text-center">パスワードリセット</h1>
+  <div class="w-[400px] rounded-xl bg-gray-900 border border-gray-800 p-8 shadow-2xl space-y-6">
+    <h1 class="text-xl font-bold text-gray-100 text-center">パスワードリセット</h1>
 
     <%= form_for(resource, as: resource_name, url: password_path(resource_name)) do |f| %>
       <%= render "devise/shared/error_messages", resource: resource %>
 
       <div class="space-y-4">
         <div>
-          <p class="text-sm font-bold text-gray-700 mb-1">メールアドレス</p>
+          <p class="text-xs font-bold text-gray-400 mb-1">メールアドレス</p>
           <%= f.email_field :email,
               autofocus: true,
               autocomplete: "email",
-              class: "w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" %>
+              class: "w-full rounded-lg border border-gray-700 bg-gray-800 text-gray-100 placeholder-gray-500 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" %>
         </div>
       </div>
 
       <%= f.submit "送信",
-          class: "w-full mt-6 rounded-lg bg-blue-500 px-6 py-3 font-bold text-white shadow-sm hover:bg-blue-600 cursor-pointer" %>
+          class: "w-full mt-6 rounded-lg bg-green-500 hover:bg-green-700 px-6 py-3 font-bold text-gray-950 shadow-sm cursor-pointer" %>
     <% end %>
 
-    <div class="text-center text-sm text-gray-500">
-      <%= link_to "ログインページに戻る", new_user_session_path, class: "text-blue-500 hover:underline" %>
+    <div class="text-center text-sm text-gray-400">
+      <%= link_to "ログインページに戻る", new_user_session_path, class: "text-green-500 hover:underline" %>
     </div>
   </div>
 </div>
