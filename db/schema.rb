@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_22_130452) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_23_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -74,6 +74,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_22_130452) do
     t.index ["user_id"], name: "index_typing_results_on_user_id"
   end
 
+  create_table "user_achievements", force: :cascade do |t|
+    t.datetime "achieved_at", null: false
+    t.string "achievement_key", null: false
+    t.datetime "created_at", null: false
+    t.datetime "notified_at"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "achievement_key"], name: "index_user_achievements_on_user_id_and_achievement_key", unique: true
+    t.index ["user_id"], name: "index_user_achievements_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "confirmation_sent_at"
     t.string "confirmation_token"
@@ -101,4 +112,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_22_130452) do
   add_foreign_key "favorites", "users"
   add_foreign_key "typing_results", "articles"
   add_foreign_key "typing_results", "users"
+  add_foreign_key "user_achievements", "users"
 end

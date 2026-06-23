@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   get "/typing", to: "typing#show"
   get "/typing/result", to: "typing#result"
   post "/typing/results", to: "typing#save_result"
+  post "/typing/results/share_achievement", to: "typing#record_share_achievement"
 
   resources :typing_histories, only: [ :index, :show, :update ], path: "typing/histories" do
     collection do

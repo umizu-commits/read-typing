@@ -8,6 +8,7 @@ class ArticlesController < ApplicationController
     end
 
     if form.save
+      AchievementGrantService.new(current_user).call(context: :article_saved) if user_signed_in?
       if params[:save_only] == "true"
         redirect_to articles_path, notice: "記事を保存しました"
       else

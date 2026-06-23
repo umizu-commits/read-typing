@@ -41,10 +41,18 @@ class TypingController < ApplicationController
 
         # 保存結果に応じてレスポンスを返す
         if result.persisted?
-            render json: { status: "saved" }
+            newly_granted = AchievementGrantService.new(current_user).call(context: :typing_saved, typing_result: result)
+            achievement_data = newly_granted.map { |k| { key: k, name: Achievement.find(k)[:name] } }
+            render json: { status: "saved", achievements: achievement_data }
         else
             render json: { status: "failed" }
         end
+    end
+
+    def record_share_achievement
+      return render json: { status: "skipped" } unless user_signed_in?
+      AchievementGrantService.new(current_user).call(context: :sns_shared)
+      render json: { status: "ok" }
     end
 
     private
