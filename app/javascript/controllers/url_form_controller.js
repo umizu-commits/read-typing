@@ -7,26 +7,26 @@ export default class extends Controller {
     // 表示する
     this.urlContentTarget.classList.remove("hidden")
     // アクティブなタブ → 青いアンダーライン + 青い文字
-    this.urlTabTarget.classList.add("border-blue-500", "text-blue-600")
-    this.urlTabTarget.classList.remove("border-transparent", "text-gray-400")
+    this.urlTabTarget.classList.add("border-green-500", "text-green-500")
+    this.urlTabTarget.classList.remove("border-transparent", "text-gray-500")
     // 非表示にする
     this.textContentTarget.classList.add("hidden")
     // 非アクティブなタブ → 透明アンダーライン + グレー文字
-    this.textTabTarget.classList.add("border-transparent", "text-gray-400")
-    this.textTabTarget.classList.remove("border-blue-500", "text-blue-600")
+    this.textTabTarget.classList.add("border-transparent", "text-gray-500")
+    this.textTabTarget.classList.remove("border-green-500", "text-green-500")
   }
 
   showText() {
         // 表示する
     this.textContentTarget.classList.remove("hidden")
     // アクティブなタブ → 青いアンダーライン + 青い文字
-    this.textTabTarget.classList.add("border-blue-500", "text-blue-600")
-    this.textTabTarget.classList.remove("border-transparent", "text-gray-400")
+    this.textTabTarget.classList.add("border-green-500", "text-green-500")
+    this.textTabTarget.classList.remove("border-transparent", "text-gray-500")
     // 非表示にする
     this.urlContentTarget.classList.add("hidden")
     // 非アクティブなタブ → 透明アンダーライン + グレー文字
-    this.urlTabTarget.classList.add("border-transparent", "text-gray-400")
-    this.urlTabTarget.classList.remove("border-blue-500", "text-blue-600")
+    this.urlTabTarget.classList.add("border-transparent", "text-gray-500")
+    this.urlTabTarget.classList.remove("border-green-500", "text-green-500")
   }
 
   async submitUrl(event) {

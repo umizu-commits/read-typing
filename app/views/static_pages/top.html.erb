@@ -1,95 +1,96 @@
-  <div class="w-full pt-6 pb-6">
+  <div class="w-full pt-4 pb-4">
 
     <%# Hero セクション %>
-    <div class="text-center mb-6">
-      <h1 class="text-4xl font-black mb-4">記事で、タイピングを学びに変える。</h1>
-      <p class="text-gray-600 leading-relaxed">
+    <div class="text-center mb-3">
+      <h1 class="text-3xl font-black mb-2 text-gray-100">記事で、タイピングを学びに変える。</h1>
+      <p class="text-gray-400 leading-relaxed">
         記事をタイピングしながら、知識習得とタイピング速度向上を同時に実現します。
       </p>
     </div>
 
     <%# フォームカード %>
-    <div data-controller="typing-form url-form" class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 max-w-2xl mx-auto">
+    <div data-controller="typing-form url-form" class="bg-gray-900 rounded-xl border border-gray-800 shadow-2xl p-5 max-w-2xl mx-auto">
 
       <%# タブボタン %>
-      <div class="flex border-b border-gray-200 mb-6">
+      <div class="flex border-b border-gray-800 mb-4">
         <button type="button"
                 data-url-form-target="urlTab"
                 data-action="click->url-form#showUrl"
-                class="px-4 py-2 text-sm font-bold border-b-2 border-blue-500 text-blue-600">
+                class="px-4 py-2 text-sm font-bold border-b-2 border-green-500 text-green-500">
           URLから取得
         </button>
         <button type="button"
                 data-url-form-target="textTab"
                 data-action="click->url-form#showText"
-                class="px-4 py-2 text-sm font-bold border-b-2 border-transparent text-gray-400">
+                class="px-4 py-2 text-sm font-bold border-b-2 border-transparent text-gray-500">
           テキストを貼り付け
         </button>
       </div>
 
       <%# URLフォームコンテンツ %>
       <div data-url-form-target="urlContent">
-        <div class="mb-4">
-          <h2 class="font-bold text-lg flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <div class="mb-2">
+          <h2 class="font-bold text-lg flex items-center gap-2 text-gray-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
             </svg>
             URLから記事を取得
           </h2>
-          <p class="text-sm text-gray-500 mt-1">
+          <p class="text-sm text-gray-400 mt-1">
             公開されている記事のURLを貼るだけ。本文を自動で取得します。
           </p>
         </div>
 
         <div data-url-form-target="urlError"
-             class="hidden mb-4 bg-red-50 border border-red-300 text-red-700 rounded-lg px-4 py-3 text-sm">
+             class="hidden mb-4 bg-red-950 border border-red-800 text-red-400 rounded-lg px-4 py-3 text-sm">
         </div>
 
         <form action="/articles" method="post" data-action="submit->url-form#submitUrl" data-turbo="false">
           <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-          <label class="block text-xs font-bold text-gray-500 mb-1">
+          <label class="block text-xs font-bold text-gray-400 mb-1">
             記事URL
           </label>
           <input type="url"
                  name="url"
                  data-url-form-target="urlInput"
                  placeholder="https://example.com/article"
-                 class="w-full border border-gray-200 rounded-lg p-3 text-sm
-                        focus:outline-none focus:ring-2 focus:ring-blue-400">
-          <div class="mt-4">
-            <label class="block text-xs font-bold text-gray-500 mb-1">
-              カテゴリ
-              <span class="text-gray-400 font-normal ml-1">（任意）</span>
-            </label>
-            <select name="category"
-                    class="w-full border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-700">
-              <option value="">選択しない</option>
-              <% Article::CATEGORIES.each do |value, label| %>
-                <option value="<%= value %>"><%= label %></option>
-              <% end %>
-            </select>
-          </div>
-
-          <div class="mt-4">
-            <label class="block text-xs font-bold text-gray-500 mb-1">
-              タグ
-              <span class="text-gray-400 font-normal ml-1">（任意・カンマ区切りで複数入力可）</span>
-            </label>
-            <input type="text"
-                   name="tag_names"
-                   placeholder="例：Rails, タイピング, 技術"
-                   class="w-full border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                 class="w-full border border-gray-700 bg-gray-800 text-gray-100 placeholder-gray-500 rounded-lg p-3 text-sm
+                        focus:outline-none focus:ring-2 focus:ring-green-500">
+          <div class="grid grid-cols-2 gap-3 mt-3">
+            <div>
+              <label class="block text-xs font-bold text-gray-400 mb-1">
+                カテゴリ
+                <span class="text-gray-500 font-normal ml-1">（任意）</span>
+              </label>
+              <select name="category"
+                      class="w-full border border-gray-700 bg-gray-800 text-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                <option value="">選択しない</option>
+                <% Article::CATEGORIES.each do |value, label| %>
+                  <option value="<%= value %>"><%= label %></option>
+                <% end %>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-400 mb-1">
+                タグ
+                <span class="text-gray-500 font-normal ml-1">（任意・カンマ区切り）</span>
+              </label>
+              <input type="text"
+                     name="tag_names"
+                     placeholder="例：Rails, タイピング"
+                     class="w-full border border-gray-700 bg-gray-800 text-gray-100 placeholder-gray-500 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
           </div>
 
           <button type="submit"
-                  class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3
-                        rounded-lg mt-4 cursor-pointer transition-colors">
+                  class="w-full bg-green-500 hover:bg-green-700 text-gray-950 font-bold py-3
+                        rounded-lg mt-3 cursor-pointer transition-colors">
             記事を取得してタイピング練習を開始する
           </button>
 
           <button type="button"
                   data-action="click->url-form#fetchWithoutSave"
-                  class="w-full bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 font-bold py-3 rounded-lg mt-2 cursor-pointer transition-colors">
+                  class="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 font-bold py-3 rounded-lg mt-2 cursor-pointer transition-colors">
             保存せずに開始する
           </button>
         </form>
@@ -97,68 +98,69 @@
 
       <%# テキストフォームコンテンツ %>
       <div data-url-form-target="textContent" class="hidden">
-        <div class="mb-4">
-          <h2 class="font-bold text-lg flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <div class="mb-2">
+          <h2 class="font-bold text-lg flex items-center gap-2 text-gray-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             テキストを直接貼り付け
           </h2>
-          <p class="text-sm text-gray-500 mt-1">
+          <p class="text-sm text-gray-400 mt-1">
             URLから取得できない記事や、自分で用意した文章を使う場合はこちら。
           </p>
         </div>
 
         <div data-typing-form-target="error"
-             class="hidden mb-4 bg-red-50 border border-red-300 text-red-700 rounded-lg px-4 py-3 text-sm">
+             class="hidden mb-4 bg-red-950 border border-red-800 text-red-400 rounded-lg px-4 py-3 text-sm">
         </div>
 
         <form data-action="submit->typing-form#submit">
-          <div class="mb-3">
-            <label class="block text-xs font-bold text-gray-500 mb-1">
-              カテゴリ
-              <span class="text-gray-400 font-normal ml-1">（任意）</span>
-            </label>
-            <select data-typing-form-target="category"
-                    class="w-full border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 text-gray-700">
-              <option value="">選択しない</option>
-              <% Article::CATEGORIES.each do |value, label| %>
-                <option value="<%= value %>"><%= label %></option>
-              <% end %>
-            </select>
+          <div class="grid grid-cols-2 gap-3 mb-2">
+            <div>
+              <label class="block text-xs font-bold text-gray-400 mb-1">
+                カテゴリ
+                <span class="text-gray-500 font-normal ml-1">（任意）</span>
+              </label>
+              <select data-typing-form-target="category"
+                      class="w-full border border-gray-700 bg-gray-800 text-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                <option value="">選択しない</option>
+                <% Article::CATEGORIES.each do |value, label| %>
+                  <option value="<%= value %>"><%= label %></option>
+                <% end %>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-400 mb-1">
+                タグ
+                <span class="text-gray-500 font-normal ml-1">（任意・カンマ区切り）</span>
+              </label>
+              <input type="text"
+                     data-typing-form-target="tagNames"
+                     placeholder="例：Rails, タイピング"
+                     class="w-full border border-gray-700 bg-gray-800 text-gray-100 placeholder-gray-500 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
           </div>
 
-          <div class="mb-3">
-            <label class="block text-xs font-bold text-gray-500 mb-1">
-              タグ
-              <span class="text-gray-400 font-normal ml-1">（任意・カンマ区切りで複数入力可）</span>
-            </label>
-            <input type="text"
-                   data-typing-form-target="tagNames"
-                   placeholder="例：Rails, タイピング, 技術"
-                   class="w-full border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
-          </div>
-
-          <div class="mb-3">
-            <label class="block text-xs font-bold text-gray-500 mb-1">
+          <div class="mb-2">
+            <label class="block text-xs font-bold text-gray-400 mb-1">
               記事タイトル
-              <span class="text-gray-400 font-normal ml-1">（任意）</span>
+              <span class="text-gray-500 font-normal ml-1">（任意）</span>
             </label>
             <input type="text"
                    data-typing-form-target="title"
                    placeholder="ここに記事のタイトルを入力してください"
                    maxlength="255"
-                   class="w-full border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                   class="w-full border border-gray-700 bg-gray-800 text-gray-100 placeholder-gray-500 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
           </div>
-          <label class="block text-xs font-bold text-gray-500 mb-1">
+          <label class="block text-xs font-bold text-gray-400 mb-1">
             記事本文
           </label>
-          <textarea data-typing-form-target="text" 
+          <textarea data-typing-form-target="text"
                     data-action="input->typing-form#toggleClearButton"
                     placeholder="ここに記事の内容をペーストしてください（50文字以上、10,000文字以内）"
-                    rows="8"
-                    class="w-full border border-gray-200 rounded-lg p-4 text-sm resize-none
-                           focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+                    rows="5"
+                    class="w-full border border-gray-700 bg-gray-800 text-gray-100 placeholder-gray-500 rounded-lg p-3 text-sm resize-none
+                           focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
 
           <div class="flex justify-between items-center mt-2">
             <%# テキストクリアボタン %>
@@ -166,30 +168,30 @@
                     data-action="click->typing-form#clear"
                     data-typing-form-target="clearButton"
                     disabled
-                    class="text-xs text-gray-400 hover:text-blue-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                    class="text-xs text-gray-500 hover:text-green-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
               テキストをクリア
             </button>
 
             <p data-typing-form-target="counter"
-               class="text-xs text-gray-400">
+               class="text-xs text-gray-500">
               0 / 10,000 文字
             </p>
           </div>
 
           <button type="button"
                   data-action="click->typing-form#submitWithSave"
-                  class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg mt-4 cursor-pointer transition-colors">
+                  class="w-full bg-green-500 hover:bg-green-700 text-gray-950 font-bold py-3 rounded-lg mt-3 cursor-pointer transition-colors">
             テキストを保存して練習を開始する
           </button>
 
           <button type="submit"
-                  class="w-full bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 font-bold py-3 rounded-lg mt-2 cursor-pointer transition-colors">
+                  class="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 font-bold py-3 rounded-lg mt-2 cursor-pointer transition-colors">
             保存せずに練習を開始する
           </button>
         </form>
       </div>
 
-      <div class="flex justify-center gap-6 mt-6 text-sm text-gray-500">
+      <div class="flex justify-center gap-6 mt-4 text-sm text-green-500">
         <span>✓ WPM計測</span>
         <span>✓ ミスカウント表示</span>
         <span>✓ ログイン不要ですぐ開始</span>
@@ -199,10 +201,10 @@
 
     <%# フッター CTA %>
     <% unless user_signed_in? %>
-      <div class="text-center mt-6">
-        <div class="inline-block bg-white border border-gray-200 rounded-lg px-6 py-2 text-sm text-gray-600">
+      <div class="text-center mt-4">
+        <div class="inline-block bg-gray-900 border border-gray-800 rounded-lg px-6 py-2 text-sm text-gray-400">
           タイピング結果を保存して成長を記録しませんか？
-          <%= link_to "今すぐログイン・新規登録", new_user_session_path, class: "text-blue-600 font-bold ml-1 hover:underline" %>
+          <%= link_to "今すぐログイン・新規登録", new_user_session_path, class: "text-green-500 font-bold ml-1 hover:underline" %>
         </div>
       </div>
     <% end %>
