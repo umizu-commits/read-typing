@@ -38,8 +38,9 @@ export default class extends Controller {
             this.articleTitleTextTarget.textContent = articleTitle
         }
 
+        const body = this.buildResultBody(result, articleText, articleTitle, articleId)
+
         if (result.reason === "completed") {
-            const body = { wpm: result.wpm, cpm: result.cpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText, article_title: articleTitle, correct_count: result.correctCount, article_id: articleId }
             this.postResult(body, (data) => {
                 if (data.status === "saved") {
                     this.saveSuccessTarget.classList.remove("hidden")
@@ -54,11 +55,10 @@ export default class extends Controller {
         } else if (result.reason === "ended") {
             // 途中終了時は保存ボタンを表示してユーザーの判断に委ねる
             const isLoggedIn = document.querySelector('meta[name="user-signed-in"]')?.content === "true"
-            
+
             if (isLoggedIn) {
-              this.saveButtonTarget.classList.remove("hidden") // 保存ボタンを表示
+                this.saveButtonTarget.classList.remove("hidden")
             } else {
-                const body = { wpm: result.wpm, cpm: result.cpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText, article_title: articleTitle, correct_count: result.correctCount, article_id: articleId }
                 this.postResult(body, (data) => {
                     if (data.status === "skipped") {
                         this.saveSkippedTarget.classList.remove("hidden")
@@ -99,7 +99,7 @@ export default class extends Controller {
         const articleTitle = sessionStorage.getItem("article_title") || ""
         const result = JSON.parse(sessionStorage.getItem("typing_result"))
         const articleId = sessionStorage.getItem("article_id") || null
-        const body = { wpm: result.wpm, cpm: result.cpm, accuracy: result.accuracy, miss_count: result.missCount, elapsed_time: result.elapsedSeconds, article_text: articleText, article_title: articleTitle, correct_count: result.correctCount, article_id: articleId }
+        const body = this.buildResultBody(result, articleText, articleTitle, articleId)
 
         this.postResult(body, (data) => {
             if (data.status === "saved") {
@@ -118,6 +118,20 @@ export default class extends Controller {
         sessionStorage.removeItem("article_title")
         sessionStorage.removeItem("article_id")
         window.location.href = "/"
+    }
+
+    buildResultBody(result, articleText, articleTitle, articleId) {
+        return {
+            wpm: result.wpm,
+            cpm: result.cpm,
+            accuracy: result.accuracy,
+            miss_count: result.missCount,
+            elapsed_time: result.elapsedSeconds,
+            article_text: articleText,
+            article_title: articleTitle,
+            correct_count: result.correctCount,
+            article_id: articleId
+        }
     }
 
     buildShareText() {

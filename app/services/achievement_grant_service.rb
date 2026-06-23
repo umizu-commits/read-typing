@@ -35,7 +35,7 @@ class AchievementGrantService
   def condition_met?(key, result)
     case key
     when "first_typing"  then true
-    when "first_article" then @user.articles.count == 1
+    when "first_article" then @user.articles.count >= 1
     when "typing_10"     then typing_count >= 10
     when "typing_100"    then typing_count >= 100
     when "typing_1000"   then typing_count >= 1000
@@ -85,7 +85,7 @@ class AchievementGrantService
                  .reverse
 
     return 0 if dates.empty?
-    return 0 if dates.first < Date.today - 1.day
+    return 0 if dates.first < Date.today - 1.day # 最後の練習日が昨日より前ならストリーク途切れ
 
     streak = 1
     dates.each_cons(2) do |later, earlier|

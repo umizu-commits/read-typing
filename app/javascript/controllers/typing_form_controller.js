@@ -1,70 +1,80 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-static targets = ["text", "error", "clearButton", "title", "counter", "category", "tagNames"]
+  static targets = ["text", "error", "clearButton", "title", "counter", "category", "tagNames"]
 
-submit(event) {
+  submit(event) {
     event.preventDefault()
 
-    const text = this.textTarget.value.trim()
-
-    if (text === "") {
-    this.showError("テキストを入力してください")
-    return
-    }
-
-    if (text.length < 50) {
-    this.showError("50文字以上のテキストを入力してください")
-    return
-    }
-
-    if (text.length > 10000) {
-    this.showError("10,000文字以内のテキストを入力してください")
-    return
-    }
+    const text = this.validateText()
+    if (!text) return
 
     sessionStorage.setItem("typing_text", text)
-    const title = this.titleTarget.value.trim()
-    sessionStorage.setItem("article_title", title)
+    sessionStorage.setItem("article_title", this.titleTarget.value.trim())
     window.location.href = "/typing"
-}
+  }
 
-showError(message) {
+  async saveOnly() {
+    const text = this.validateText()
+    if (!text) return
+
+    await this.submitArticleForm(text, { save_only: "true" })
+  }
+
+  async submitWithSave(event) {
+    const text = this.validateText()
+    if (!text) return
+
+    await this.submitArticleForm(text)
+  }
+
+  showError(message) {
     this.errorTarget.textContent = message
     this.errorTarget.classList.remove("hidden")
-}
+  }
 
-clear() {
+  clear() {
     const confirmed = window.confirm("入力した文章を削除しますか？この操作を行うと元に戻せません。")
     if (!confirmed) return
 
     this.textTarget.value = ""
     this.clearButtonTarget.disabled = true
     this.errorTarget.classList.add("hidden")
-}
+  }
 
-toggleClearButton(){
+  toggleClearButton() {
     const text = this.textTarget.value.trim()
     this.clearButtonTarget.disabled = text === ""
 
     if (this.hasCounterTarget) {
-        const count = text.length
-        this.counterTarget.textContent = `${count.toLocaleString()} / 10,000 文字`
-        this.counterTarget.classList.toggle("text-red-500", count > 10000)
-        this.counterTarget.classList.toggle("text-gray-400", count <= 10000)
+      const count = text.length
+      this.counterTarget.textContent = `${count.toLocaleString()} / 10,000 文字`
+      this.counterTarget.classList.toggle("text-red-500", count > 10000)
+      this.counterTarget.classList.toggle("text-gray-400", count <= 10000)
     }
-}
+  }
 
-saveOnly() {
+  // テキストの空・文字数チェックを行い、有効なテキストを返す。無効なら null を返す。
+  validateText() {
     const text = this.textTarget.value.trim()
-    if (text === "") { this.showError("テキストを入力してください"); return }
-    if (text.length < 50) { this.showError("50文字以上のテキストを入力してください"); return }
-    if (text.length > 10000) { this.showError("10,000文字以内のテキストを入力してください"); return }
+    if (text === "") {
+      this.showError("テキストを入力してください")
+      return null
+    }
+    if (text.length < 50) {
+      this.showError("50文字以上のテキストを入力してください")
+      return null
+    }
+    if (text.length > 10000) {
+      this.showError("10,000文字以内のテキストを入力してください")
+      return null
+    }
+    return text
+  }
 
-    const form = document.createElement("form")
-    form.method = "post"
-    form.action = "/articles"
-
+  // POST /articles に source_type: "text" で送信する
+  async submitArticleForm(text, extraFields = {}) {
+    const formData = new FormData()
     const fields = {
       authenticity_token: document.querySelector("meta[name='csrf-token']").content,
       source_type: "text",
@@ -72,50 +82,23 @@ saveOnly() {
       title: this.titleTarget.value.trim(),
       category: this.categoryTarget.value,
       tag_names: this.tagNamesTarget.value,
-      save_only: "true"
+      ...extraFields
     }
+    Object.entries(fields).forEach(([name, value]) => formData.append(name, value))
 
-    Object.entries(fields).forEach(([name, value]) => {
-      const input = document.createElement("input")
-      input.type = "hidden"
-      input.name = name
-      input.value = value
-      form.appendChild(input)
+    const response = await fetch("/articles", {
+      method: "POST",
+      body: formData,
+      redirect: "follow"
     })
 
-    document.body.appendChild(form)
-    form.submit()
-  }
-
-submitWithSave(event) {
-    const text = this.textTarget.value.trim()
-    if (text === "") { this.showError("テキストを入力してください"); return }
-    if (text.length < 50) { this.showError("50文字以上のテキストを入力してください"); return }
-    if (text.length > 10000) { this.showError("10,000文字以内のテキストを入力してください"); return }
-
-    // POST /articles に source_type: "text" で送信
-    const form = document.createElement("form")
-    form.method = "post"
-    form.action = "/articles"
-
-    const fields = {
-        authenticity_token: document.querySelector("meta[name='csrf-token']").content,
-        source_type: "text",
-        body: text,
-        title: this.titleTarget.value.trim(),
-        category: this.categoryTarget.value,
-        tag_names: this.tagNamesTarget.value
+    if (response.status === 429) {
+      this.showError("リクエストが多すぎます。しばらく時間をおいてから再度お試しください。")
+      return
     }
 
-    Object.entries(fields).forEach(([name, value]) => {
-        const input = document.createElement("input")
-        input.type = "hidden"
-        input.name = name
-        input.value = value
-        form.appendChild(input)
-    })
-
-    document.body.appendChild(form)
-    form.submit()
+    if (response.redirected) {
+      window.location.href = response.url
+    }
   }
 }
