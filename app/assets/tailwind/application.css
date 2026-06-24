@@ -41,3 +41,16 @@ select:-webkit-autofill:focus {
     display: inline-block;
     animation: char-shake 0.2s ease-in-out;
 }
+
+/* プライマリボタン（緑背景）のホバー時に1pxリフトで立体感を演出 */
+button.bg-green-500,
+a.bg-green-500,
+input[type="submit"].bg-green-500 {
+    transition: transform 150ms ease-out, background-color 150ms ease-out;
+}
+
+button.bg-green-500:hover,
+a.bg-green-500:hover,
+input[type="submit"].bg-green-500:hover {
+    transform: translateY(-1px);
+}

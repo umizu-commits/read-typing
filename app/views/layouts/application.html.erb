@@ -107,6 +107,38 @@
         </div>
       </footer>
     <% end %>
+    <%# 確認モーダル（自作 turbo confirm） %>
+    <div data-controller="confirm-modal"
+         data-action="click->confirm-modal#backdropClick keydown@window->confirm-modal#keydown"
+         class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+      <div data-confirm-modal-target="panel"
+           class="bg-gray-900 border border-gray-800 rounded-xl shadow-xl ring-1 ring-white/5 p-6 w-[420px] transition-all duration-150 opacity-0 scale-95">
+        <div class="flex items-start gap-3 mb-5">
+          <div class="w-10 h-10 rounded-full bg-red-950 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <div class="flex-1">
+            <h2 class="text-base font-bold text-gray-100 mb-1">確認</h2>
+            <p data-confirm-modal-target="message" class="text-sm text-gray-400 leading-relaxed"></p>
+          </div>
+        </div>
+        <div class="flex justify-end gap-2">
+          <button type="button"
+                  data-action="click->confirm-modal#cancel"
+                  class="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 text-sm font-bold transition-colors">
+            キャンセル
+          </button>
+          <button type="button"
+                  data-action="click->confirm-modal#confirm"
+                  class="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm font-bold transition-colors">
+            実行する
+          </button>
+        </div>
+      </div>
+    </div>
+
     <%# モーダル ヘルプ用 %>
     <div data-help-target="modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70">
       <div class="bg-gray-900 border border-gray-800 rounded-xl shadow-2xl p-8 w-[560px] max-h-[80vh] overflow-y-auto">
