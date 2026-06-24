@@ -47,6 +47,16 @@
             </svg>
           </button>
 
+          <%# ヘルプ ? ボタン（直接アクセス用） %>
+          <button type="button"
+                  data-action="click->help#open"
+                  title="ヘルプを開く"
+                  class="text-gray-300 hover:text-gray-100 p-2 rounded-lg hover:bg-gray-800 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+            </svg>
+          </button>
+
           <%# ログイン中アイコン %>
           <% if user_signed_in? %>
             <span class="text-green-500 p-2" title="ログイン中">
@@ -156,9 +166,16 @@
         <div class="flex gap-1 border-b border-gray-800 px-6">
           <button type="button"
                   data-tabs-target="tab"
-                  data-tab="usage"
+                  data-tab="tutorial"
                   data-action="click->tabs#show"
                   class="px-4 py-2.5 text-sm font-bold border-b-2 border-green-500 text-green-500">
+            チュートリアル
+          </button>
+          <button type="button"
+                  data-tabs-target="tab"
+                  data-tab="usage"
+                  data-action="click->tabs#show"
+                  class="px-4 py-2.5 text-sm font-bold border-b-2 border-transparent text-gray-500 hover:text-gray-300">
             使い方
           </button>
           <button type="button"
@@ -180,8 +197,113 @@
         <%# タブコンテンツ %>
         <div class="overflow-y-auto px-6 py-5 flex-1">
 
+          <%# チュートリアルタブ %>
+          <div data-tabs-target="panel" data-tab="tutorial">
+            <div data-controller="slides">
+
+              <%# スライド表示エリア %>
+              <div class="mb-4">
+
+                <%# Slide 1: 練習を始める：URLから取得 %>
+                <div data-slides-target="slide">
+                  <%= render "shared/tutorial_media", filename: "slide-1.png", alt: "URLから取得タブの画面" %>
+                  <h3 class="text-base font-bold text-gray-100 mb-1">練習を始める：URLから取得</h3>
+                  <p class="text-sm text-gray-400 leading-relaxed">トップページの「URLから取得」タブに記事のURLを貼り付けるだけで、本文を自動取得して練習を開始できます。</p>
+                </div>
+
+                <%# Slide 2: 練習を始める：テキストを貼り付け %>
+                <div data-slides-target="slide" class="hidden">
+                  <%= render "shared/tutorial_media", filename: "slide-2.png", alt: "テキストを貼り付けタブの画面" %>
+                  <h3 class="text-base font-bold text-gray-100 mb-1">練習を始める：テキストを貼り付け</h3>
+                  <p class="text-sm text-gray-400 leading-relaxed">URLで取得できない記事や、自分で用意した文章を使う場合は、「テキストを貼り付け」タブから直接ペーストできます。</p>
+                </div>
+
+                <%# Slide 3: タイピング画面の操作 %>
+                <div data-slides-target="slide" class="hidden">
+                  <%= render "shared/tutorial_media", filename: "slide-3.gif", alt: "タイピング中の画面アニメーション" %>
+                  <h3 class="text-base font-bold text-gray-100 mb-1">タイピング画面の操作</h3>
+                  <p class="text-sm text-gray-400 leading-relaxed">画面中央が練習する本文、右側に進捗・タイマー・操作ボタン、下部にキーボードビジュアライザが表示されます。本文上のカーソル位置を見ながら入力します。</p>
+                </div>
+
+                <%# Slide 4: スキップモードで効率化 %>
+                <div data-slides-target="slide" class="hidden">
+                  <%= render "shared/tutorial_media", filename: "slide-4.gif", alt: "スキップモードの操作アニメーション" %>
+                  <h3 class="text-base font-bold text-gray-100 mb-1">スキップモードで効率化</h3>
+                  <p class="text-sm text-gray-400 leading-relaxed">記号類が多い文章では、右側の「スキップモード: ON」ボタンを有効にすると、スペースキーで記号を1文字ずつスキップできます。漢字・かな・英数字は対象外です。</p>
+                </div>
+
+                <%# Slide 5: 結果画面で振り返る %>
+                <div data-slides-target="slide" class="hidden">
+                  <%= render "shared/tutorial_media", filename: "slide-5.png", alt: "結果画面（ランク・ヒートマップ）" %>
+                  <h3 class="text-base font-bold text-gray-100 mb-1">結果画面で振り返る</h3>
+                  <p class="text-sm text-gray-400 leading-relaxed">完走または途中終了で結果画面へ。S/A/B/C/Dの総合ランク、CPM、正答率、ミス箇所のヒートマップで振り返れます。Xやクリップボードへの共有も可能です。</p>
+                </div>
+
+                <%# Slide 6: 履歴で成長を見る %>
+                <div data-slides-target="slide" class="hidden">
+                  <%= render "shared/tutorial_media", filename: "slide-6.png", alt: "履歴ページ（推移グラフ・期間フィルタ）" %>
+                  <h3 class="text-base font-bold text-gray-100 mb-1">履歴で成長を見る</h3>
+                  <p class="text-sm text-gray-400 leading-relaxed">ログイン時は履歴ページで CPM・正答率の推移と自己ベストマーカーを確認できます。直近7日 / 30日 / 全期間の期間フィルタで絞り込み可能です。</p>
+                </div>
+
+                <%# Slide 7: 継続マップと実績バッジ %>
+                <div data-slides-target="slide" class="hidden">
+                  <%= render "shared/tutorial_media", filename: "slide-7.gif", alt: "実績バッジ獲得時の紙吹雪演出" %>
+                  <h3 class="text-base font-bold text-gray-100 mb-1">継続マップと実績バッジ</h3>
+                  <p class="text-sm text-gray-400 leading-relaxed">GitHub風のカレンダーで今年の練習日を一覧できます。練習を重ねると実績バッジが解除され、獲得時は紙吹雪と共に祝福されます。</p>
+                </div>
+
+                <%# Slide 8: 記事を保存して再利用 %>
+                <div data-slides-target="slide" class="hidden">
+                  <%= render "shared/tutorial_media", filename: "slide-8.png", alt: "保存記事ページ（検索・フィルタ）" %>
+                  <h3 class="text-base font-bold text-gray-100 mb-1">記事を保存して再利用</h3>
+                  <p class="text-sm text-gray-400 leading-relaxed">「保存して開始する」を選ぶと記事がアカウントに残ります。保存記事ページではタイトル/URL検索、カテゴリ・タグ、お気に入りで絞り込み、ワンクリックで再練習できます。</p>
+                </div>
+
+              </div>
+
+              <%# ナビゲーション %>
+              <div class="flex items-center justify-between">
+                <button type="button"
+                        data-action="click->slides#prev"
+                        data-slides-target="prev"
+                        class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-gray-800 transition-all">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                  </svg>
+                  前へ
+                </button>
+
+                <div class="flex items-center gap-1.5">
+                  <% 8.times do |i| %>
+                    <button type="button"
+                            data-action="click->slides#goto"
+                            data-slides-target="dot"
+                            data-index="<%= i %>"
+                            class="w-2 h-2 rounded-full bg-gray-700 transition-all"></button>
+                  <% end %>
+                </div>
+
+                <button type="button"
+                        data-action="click->slides#next"
+                        data-slides-target="next"
+                        class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-bold text-gray-300 hover:bg-gray-800 transition-all">
+                  次へ
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                  </svg>
+                </button>
+              </div>
+
+              <%# カウンタ %>
+              <p class="text-center text-xs text-gray-500 mt-2">
+                <span data-slides-target="counter">1 / 8</span>
+              </p>
+            </div>
+          </div>
+
           <%# 使い方タブ %>
-          <div data-tabs-target="panel" data-tab="usage">
+          <div data-tabs-target="panel" data-tab="usage" class="hidden">
             <ol class="space-y-4 text-sm text-gray-300">
               <li class="flex gap-3">
                 <span class="font-bold text-green-500 shrink-0">1.</span>
