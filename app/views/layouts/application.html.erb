@@ -140,87 +140,166 @@
     </div>
 
     <%# モーダル ヘルプ用 %>
-    <div data-help-target="modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div class="bg-gray-900 border border-gray-800 rounded-xl shadow-2xl p-8 w-[560px] max-h-[80vh] overflow-y-auto">
+    <div data-help-target="modal" data-controller="tabs"
+         data-action="click->help#backdropClick keydown@window->help#keydown"
+         class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+      <div class="bg-gray-900 border border-gray-800 rounded-xl shadow-2xl w-[600px] max-h-[85vh] flex flex-col">
         <%# モーダルヘッダー %>
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-xl font-bold text-gray-100">使い方</h2>
+        <div class="flex items-center justify-between px-6 pt-5 pb-3">
+          <h2 class="text-xl font-bold text-gray-100">ヘルプ</h2>
           <button type="button" data-action="click->help#close" class="text-gray-500 hover:text-gray-300">
             ✕
           </button>
         </div>
 
-        <%# ステップ %>
-        <ol class="space-y-4 text-sm text-gray-300 mb-6">
-          <li class="flex gap-3">
-            <span class="font-bold text-green-500 shrink-0">1.</span>
-            <p>テキスト入力フォームにテキストを貼り付けてください。「タイピング練習を開始する」をクリックするとタイピング練習画面が表示されます。</p>
-          </li>
-          <li class="flex gap-3">
-            <span class="font-bold text-green-500 shrink-0">2.</span>
-            <p>キー入力を行うと計測が開始されます。日本語入力時はかな入力にてタイピングを行ってください。上部の入力文字欄で現在入力中の文字を確認できます。</p>
-          </li>
-          <li class="flex gap-3">
-            <span class="font-bold text-green-500 shrink-0">3.</span>
-            <div>
-              <p class="mb-2">すべて入力し終えるかタイピングを終了するボタンをクリックするとタイピング結果画面が表示されます。</p>
-              <div class="bg-gray-800 rounded-lg p-3 text-xs text-gray-400 space-y-1">
-                <p><span class="font-bold text-green-500">CPM</span> ＝ 1分間に入力できた文字数です。</p>
-                <p><span class="font-bold text-green-500">WPM</span> ＝ 1分間に入力できた単語数の目安です。ここではCPMを5で割った値を表示しています。</p>
+        <%# タブナビ %>
+        <div class="flex gap-1 border-b border-gray-800 px-6">
+          <button type="button"
+                  data-tabs-target="tab"
+                  data-tab="usage"
+                  data-action="click->tabs#show"
+                  class="px-4 py-2.5 text-sm font-bold border-b-2 border-green-500 text-green-500">
+            使い方
+          </button>
+          <button type="button"
+                  data-tabs-target="tab"
+                  data-tab="faq"
+                  data-action="click->tabs#show"
+                  class="px-4 py-2.5 text-sm font-bold border-b-2 border-transparent text-gray-500 hover:text-gray-300">
+            FAQ
+          </button>
+          <button type="button"
+                  data-tabs-target="tab"
+                  data-tab="notes"
+                  data-action="click->tabs#show"
+                  class="px-4 py-2.5 text-sm font-bold border-b-2 border-transparent text-gray-500 hover:text-gray-300">
+            注意事項
+          </button>
+        </div>
+
+        <%# タブコンテンツ %>
+        <div class="overflow-y-auto px-6 py-5 flex-1">
+
+          <%# 使い方タブ %>
+          <div data-tabs-target="panel" data-tab="usage">
+            <ol class="space-y-4 text-sm text-gray-300">
+              <li class="flex gap-3">
+                <span class="font-bold text-green-500 shrink-0">1.</span>
+                <p>トップページで <span class="font-bold text-gray-100">URLから取得</span> または <span class="font-bold text-gray-100">テキストを貼り付け</span> から記事を入力します。「練習を開始する」ボタンを押すと練習画面が表示されます。</p>
+              </li>
+              <li class="flex gap-3">
+                <span class="font-bold text-green-500 shrink-0">2.</span>
+                <p>キー入力で計測が開始されます。日本語入力時はかな入力で打鍵してください。上部の入力文字欄で現在入力中の文字を確認できます。記号類を自動でスキップしたい場合は右下の <span class="font-bold text-gray-100">スキップモード</span> をONにしてください。</p>
+              </li>
+              <li class="flex gap-3">
+                <span class="font-bold text-green-500 shrink-0">3.</span>
+                <div>
+                  <p class="mb-2">最後まで入力するか「タイピングを終了する」を押すと結果画面が表示されます。</p>
+                  <div class="bg-gray-800 rounded-lg p-3 text-xs text-gray-400 space-y-1">
+                    <p><span class="font-bold text-green-500">総合ランク</span>：CPM × 正答率から S/A/B/C/D で評価</p>
+                    <p><span class="font-bold text-green-500">CPM</span>：1分間に入力できた文字数</p>
+                    <p><span class="font-bold text-green-500">ミス箇所ヒートマップ</span>：苦手な文字位置を3段階の濃淡で可視化</p>
+                    <p class="pt-1">結果は <span class="font-bold text-gray-300">Xで共有</span> や <span class="font-bold text-gray-300">クリップボードへコピー</span> もできます。</p>
+                  </div>
+                </div>
+              </li>
+              <li class="flex gap-3">
+                <span class="font-bold text-green-500 shrink-0">4.</span>
+                <p>記事は <span class="font-bold text-gray-100">保存記事</span> ページから管理できます。タイトル/URL検索、カテゴリ・タグ・お気に入りでの絞り込み、ワンクリックでの再練習が可能です。</p>
+              </li>
+              <li class="flex gap-3">
+                <span class="font-bold text-green-500 shrink-0">5.</span>
+                <div>
+                  <p class="mb-2"><span class="font-bold text-gray-100">タイピング履歴</span> ページではこれまでの記録を振り返れます。</p>
+                  <div class="bg-gray-800 rounded-lg p-3 text-xs text-gray-400 space-y-1">
+                    <p><span class="font-bold text-green-500">推移グラフ</span>：CPMと正答率の推移、自己ベストをマーカーで表示</p>
+                    <p><span class="font-bold text-green-500">期間フィルタ</span>：直近7日 / 30日 / 全期間で絞り込み</p>
+                    <p><span class="font-bold text-green-500">継続マップ</span>：練習日をカレンダー形式で可視化</p>
+                  </div>
+                </div>
+              </li>
+              <li class="flex gap-3">
+                <span class="font-bold text-green-500 shrink-0">6.</span>
+                <p>練習を重ねると <span class="font-bold text-gray-100">実績バッジ</span> が解除されていきます。履歴ページの実績セクションで確認できます。</p>
+              </li>
+            </ol>
+          </div>
+
+          <%# FAQタブ %>
+          <div data-tabs-target="panel" data-tab="faq" class="hidden">
+            <div class="space-y-4">
+              <div>
+                <p class="text-sm font-bold text-gray-200">Q. ログインしなくても使えますか？</p>
+                <p class="text-sm text-gray-400 mt-1">A. 使えます。ただし、ログインしていない場合はタイピング結果や記事が保存されません。記録を残したい場合はログインしてください。</p>
+              </div>
+
+              <div>
+                <p class="text-sm font-bold text-gray-200">Q. どんな記事でも使えますか？</p>
+                <p class="text-sm text-gray-400 mt-1">A. テキストとして貼り付けられる内容、または公開記事のURLから自動取得できる内容であれば使用できます。</p>
+              </div>
+
+              <div>
+                <p class="text-sm font-bold text-gray-200">Q. URLを入力するだけで記事を取得できますか？</p>
+                <p class="text-sm text-gray-400 mt-1">A. はい。トップページの「URLから取得」タブにURLを貼り付けるだけで本文を自動取得します。</p>
+              </div>
+
+              <div>
+                <p class="text-sm font-bold text-gray-200">Q. スマートフォンでも使えますか？</p>
+                <p class="text-sm text-gray-400 mt-1">A. PC環境での利用を推奨しています。スマートフォンでは正しく表示されない場合があります。</p>
+              </div>
+
+              <div>
+                <p class="text-sm font-bold text-gray-200">Q. 総合ランクはどう決まりますか？</p>
+                <p class="text-sm text-gray-400 mt-1">A. CPM × (正答率 / 100) の「実効CPM」で評価しています。S: 280以上 / A: 200以上 / B: 140以上 / C: 80以上 / D: それ未満。速度と正確性の両立がランクアップの鍵です。</p>
+              </div>
+
+              <div>
+                <p class="text-sm font-bold text-gray-200">Q. スキップモードとは何ですか？</p>
+                <p class="text-sm text-gray-400 mt-1">A. ASCII記号や全角記号など入力しにくい文字をスペースキーで1文字ずつスキップできるモードです。タイピング画面右下のボタンでON/OFFを切り替えられます。漢字・かな・カタカナ・英数字はスキップできません。</p>
+              </div>
+
+              <div>
+                <p class="text-sm font-bold text-gray-200">Q. 保存した記事を編集・削除できますか？</p>
+                <p class="text-sm text-gray-400 mt-1">A. 保存記事一覧ページから各記事の「編集」「削除」ボタンで操作できます。削除時は確認ダイアログが表示されます。</p>
+              </div>
+
+              <div>
+                <p class="text-sm font-bold text-gray-200">Q. 退会するとデータはどうなりますか？</p>
+                <p class="text-sm text-gray-400 mt-1">A. 保存記事・タイピング履歴・実績などすべてのデータが削除されます。この操作は取り消せません。</p>
               </div>
             </div>
-          </li>
-          <li class="flex gap-3">
-            <span class="font-bold text-green-500 shrink-0">4.</span>
-            <p>ログイン時は履歴一覧を確認することができます。また、履歴一覧画面ではこれまでの練習の平均記録を確認することができます。</p>
-          </li>
-        </ol>
-
-        <%# FAQ %>
-        <div class="border-t border-gray-800 pt-4 mb-6">
-          <h3 class="text-sm font-bold text-gray-300 mb-3">よくある質問</h3>
-          <div class="space-y-3">
-
-            <div>
-              <p class="text-sm font-bold text-gray-200">Q. ログインしなくても使えますか？</p>
-              <p class="text-sm text-gray-400 mt-1">A. 使えます。ただし、ログインしていない場合はタイピング結果が保存されません。結果を履歴として残したい場合はログインしてください。</p>
-            </div>
-
-            <div>
-              <p class="text-sm font-bold text-gray-200">Q. どんな記事でも使えますか？</p>
-              <p class="text-sm text-gray-400 mt-1">A. テキストとして貼り付けられる内容であれば使用できます。</p>
-            </div>
-
-            <div>
-              <p class="text-sm font-bold text-gray-200">Q. URLを入力するだけで記事を取得できますか？</p>
-              <p class="text-sm text-gray-400 mt-1">A. 現在はテキストの貼り付けのみ対応しています。URL入力機能は今後実装予定です。</p>
-            </div>
-
-            <div>
-              <p class="text-sm font-bold text-gray-200">Q. スマートフォンでも使えますか？</p>
-              <p class="text-sm text-gray-400 mt-1">A. 現在はPC環境での利用を推奨しています。スマートフォンでは正しく表示されない場合があります。</p>
-            </div>
-
           </div>
+
+          <%# 注意事項タブ %>
+          <div data-tabs-target="panel" data-tab="notes" class="hidden">
+            <ul class="space-y-3 text-sm text-gray-400">
+              <li class="flex gap-2">
+                <span class="shrink-0">・</span>
+                <p>日本語のタイピングを行う場合、ローマ字入力ではなくかな入力を行ってください。</p>
+              </li>
+              <li class="flex gap-2">
+                <span class="shrink-0">・</span>
+                <p>スペースおよび改行は自動でスキップされます。入力は不要です。</p>
+              </li>
+              <li class="flex gap-2">
+                <span class="shrink-0">・</span>
+                <p>スキップモード ON 時は、スペースキーで記号類を1文字ずつスキップできます。漢字・かな・カタカナ・英数字には適用されません。</p>
+              </li>
+              <li class="flex gap-2">
+                <span class="shrink-0">・</span>
+                <p>結果の保存・履歴の確認・実績の獲得・記事の保存にはログインが必要です。</p>
+              </li>
+              <li class="flex gap-2">
+                <span class="shrink-0">・</span>
+                <p>本サービスはPC環境での利用を想定しています。スマートフォンでの動作は保証していません。</p>
+              </li>
+            </ul>
+          </div>
+
         </div>
 
-        <%# 注意事項 %>
-        <div class="border-t border-gray-800 pt-4 mb-6">
-          <h3 class="text-sm font-bold text-gray-300 mb-2">注意事項</h3>
-          <ul class="space-y-1 text-sm text-gray-400">
-            <li class="flex gap-2">
-              <span class="shrink-0">・</span>
-              <p>日本語のタイピングを行う場合、ローマ字入力ではなくかな入力を行ってください。</p>
-            </li>
-            <li class="flex gap-2">
-              <span class="shrink-0">・</span>
-              <p>スペースおよび改行は自動でスキップされます。入力は不要です。</p>
-            </li>
-          </ul>
-        </div>
-
-        <%# 閉じるボタン %>
-        <div class="text-center">
+        <%# フッター %>
+        <div class="px-6 pb-5 pt-3 border-t border-gray-800 text-center">
           <button type="button" data-action="click->help#close"
                   class="bg-green-500 hover:bg-green-700 text-gray-950 font-bold px-8 py-2 rounded-lg text-sm">
             閉じる
