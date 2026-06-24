@@ -1,7 +1,7 @@
 <% content_for :title, "アカウント編集 | ReadTyping" %>
 
 <div class="flex items-center justify-center flex-1 py-8">
-  <div class="w-[480px] rounded-xl bg-gray-900 border border-gray-800 p-8 shadow-2xl space-y-6">
+  <div class="w-[480px] rounded-xl bg-gray-900 border border-gray-800 p-8 shadow-xl ring-1 ring-white/5 space-y-6">
     <h1 class="text-xl font-bold text-gray-100 text-center">アカウント編集</h1>
 
     <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>

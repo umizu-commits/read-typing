@@ -12,7 +12,7 @@
   <turbo-frame id="articles-list" data-turbo-action="advance" class="block">
 
   <%# 検索・並び替えエリア %>
-  <div class="bg-gray-900 rounded-xl border border-gray-800 shadow-sm mb-4" data-controller="disclosure">
+  <div class="bg-gray-900 rounded-xl border border-gray-800 shadow-xl ring-1 ring-white/5 mb-4" data-controller="disclosure">
 
     <%# 検索フォーム %>
     <div class="flex items-center gap-2 px-4 pt-3 pb-3">
@@ -96,7 +96,7 @@
       </div>
     </div>
 
-  <div class="bg-gray-900 rounded-xl border border-gray-800 shadow-sm overflow-hidden">
+  <div class="bg-gray-900 rounded-xl border border-gray-800 shadow-xl ring-1 ring-white/5 overflow-hidden">
     <% if @articles.empty? %>
       <% if @current_keyword.present? %>
         <%# 検索結果が0件のとき %>
