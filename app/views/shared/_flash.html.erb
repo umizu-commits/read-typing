@@ -1,14 +1,18 @@
 <% if notice.present? %>
-  <div class="mt-4 text-center">
-    <div class="inline-flex items-center rounded-full bg-gray-900 border border-green-700 px-4 py-2 text-sm font-bold text-green-500">
+  <div class="mt-4 text-center" data-controller="flash">
+    <div data-flash-target="pill"
+         data-action="click->flash#dismiss"
+         class="inline-flex items-center rounded-full bg-gray-900 border border-green-700 px-4 py-2 text-sm font-bold text-green-500 cursor-pointer transition-all duration-300 opacity-0 -translate-y-2">
       <%= notice %>
     </div>
   </div>
 <% end %>
 
 <% if alert.present? %>
-  <div class="mt-4 text-center">
-    <div class="inline-flex items-center rounded-full bg-gray-900 border border-red-700 px-4 py-2 text-sm font-bold text-red-400">
+  <div class="mt-4 text-center" data-controller="flash">
+    <div data-flash-target="pill"
+         data-action="click->flash#dismiss"
+         class="inline-flex items-center rounded-full bg-gray-900 border border-red-700 px-4 py-2 text-sm font-bold text-red-400 cursor-pointer transition-all duration-300 opacity-0 -translate-y-2">
       <%= alert %>
     </div>
   </div>
