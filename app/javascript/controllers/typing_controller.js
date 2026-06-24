@@ -48,6 +48,9 @@ export default class extends Controller {
     // ミスのカウント
     this.missCount = 0
 
+    // 各文字インデックスごとのミス回数（ヒートマップ用）
+    this.missIndices = []
+
     // 正解数のカウント
     this.correctCount = 0
 
@@ -182,6 +185,7 @@ export default class extends Controller {
       }
     } else {
       this.missCount++ // ミスをカウントする
+      this.missIndices.push(this.currentIndex)
       const missSpan = spans[this.currentIndex]
       missSpan.className = `${SPAN_BASE} text-red-500 underline decoration-red-300 decoration-2`
       this.shakeChar(missSpan)
@@ -199,6 +203,7 @@ export default class extends Controller {
     this.isStarted = false
     this.currentIndex = 0
     this.missCount = 0
+    this.missIndices = []
     this.correctCount = 0
     this.skippedCount = 0
     this.isCompleted = false
@@ -350,6 +355,7 @@ export default class extends Controller {
         }
       } else {
         this.missCount++
+        this.missIndices.push(this.currentIndex)
         const missSpan = spans[this.currentIndex]
         missSpan.className = `${SPAN_BASE} text-red-500 underline decoration-red-300 decoration-2`
         this.shakeChar(missSpan)
@@ -433,6 +439,7 @@ export default class extends Controller {
     const result = {
       correctCount: this.correctCount,
       missCount: this.missCount,
+      missIndices: this.missIndices,
       skippedCount: this.skippedCount,
       elapsedSeconds: this.elapsedSeconds,
       accuracy: this.calculateAccuracy(),

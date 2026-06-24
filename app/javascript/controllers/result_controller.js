@@ -1,7 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
+import confetti from "canvas-confetti"
 
 export default class extends Controller {
-    static targets = ["accuracy", "cpm", "wpm", "missCount", "elapsedTime", "saveSuccess", "saveFailed", "saveSkipped", "saveButton", "completedMessage", "endedMessage", "articleTitle", "articleTitleText", "copySuccess", "achievementBanners"]
+    static targets = ["accuracy", "cpm", "wpm", "missCount", "elapsedTime", "saveSuccess", "saveFailed", "saveSkipped", "saveButton", "completedMessage", "endedMessage", "articleTitle", "articleTitleText", "copySuccess", "achievementBanners", "rankLetter", "missHeatmap", "heatmapBody"]
     static values = { appUrl: String }
 
     connect() {
@@ -24,11 +25,15 @@ export default class extends Controller {
 
         const result = JSON.parse(raw)
 
-        this.accuracyTarget.textContent = `${result.accuracy}%`
-        this.cpmTarget.textContent = result.cpm
-        this.wpmTarget.textContent = result.wpm
-        this.missCountTarget.textContent = result.missCount
-        this.elapsedTimeTarget.textContent = this.formatTime(result.elapsedSeconds)
+        this.animateNumber(this.accuracyTarget, result.accuracy, { suffix: "%" })
+        this.animateNumber(this.cpmTarget, result.cpm)
+        this.animateNumber(this.wpmTarget, result.wpm)
+        this.animateNumber(this.missCountTarget, result.missCount)
+        this.animateNumber(this.elapsedTimeTarget, result.elapsedSeconds, {
+            formatter: (v) => this.formatTime(Math.round(v))
+        })
+
+        this.applyRank(result)
 
         const articleText = sessionStorage.getItem("typing_text")
         const articleTitle = sessionStorage.getItem("article_title") || ""
@@ -37,6 +42,8 @@ export default class extends Controller {
             this.articleTitleTarget.classList.remove("hidden")
             this.articleTitleTextTarget.textContent = articleTitle
         }
+
+        this.renderHeatmap(articleText, result.missIndices)
 
         const body = this.buildResultBody(result, articleText, articleTitle, articleId)
 
@@ -93,6 +100,102 @@ export default class extends Controller {
         return `${m}:${s}`
     }
 
+    // 0 → 最終値へカウントアップ表示する（ease-out cubic, 約800ms）
+    animateNumber(target, finalValue, options = {}) {
+        const duration = options.duration ?? 800
+        const suffix = options.suffix ?? ""
+        const formatter = options.formatter ?? ((v) => `${Math.round(v)}${suffix}`)
+
+        if (!Number.isFinite(finalValue) || finalValue === 0) {
+            target.textContent = formatter(finalValue || 0)
+            return
+        }
+
+        const startTime = performance.now()
+        const tick = (now) => {
+            const elapsed = now - startTime
+            const progress = Math.min(elapsed / duration, 1)
+            const eased = 1 - Math.pow(1 - progress, 3)
+            const current = finalValue * eased
+            target.textContent = progress === 1 ? formatter(finalValue) : formatter(current)
+            if (progress < 1) requestAnimationFrame(tick)
+        }
+        requestAnimationFrame(tick)
+    }
+
+    // CPM × 正答率 から総合ランクを算出して表示する
+    applyRank(result) {
+        if (!this.hasRankLetterTarget) return
+        const cpm = result.cpm || 0
+        const accuracy = result.accuracy || 0
+
+        // 有効CPM（速度×精度）でランクを決める
+        const effective = cpm * (accuracy / 100)
+        let letter = "--"
+        if (cpm > 0) {
+            if (effective >= 280) letter = "S"
+            else if (effective >= 200) letter = "A"
+            else if (effective >= 140) letter = "B"
+            else if (effective >= 80) letter = "C"
+            else letter = "D"
+        }
+
+        // ランクの登場アニメーション（カウントアップと同タイミングで弾む）
+        const el = this.rankLetterTarget
+        el.textContent = letter
+        requestAnimationFrame(() => {
+            el.classList.add("transition-all", "duration-500", "ease-out")
+            el.classList.remove("opacity-0", "scale-50")
+            el.classList.add("opacity-100", "scale-100")
+        })
+    }
+
+    // ミスした文字位置をヒートマップとして本文上に可視化する
+    renderHeatmap(text, missIndices) {
+        if (!this.hasMissHeatmapTarget || !this.hasHeatmapBodyTarget) return
+        if (!text || !missIndices || missIndices.length === 0) return
+
+        const missCounts = {}
+        missIndices.forEach((i) => { missCounts[i] = (missCounts[i] || 0) + 1 })
+
+        const chars = [...text]
+        const fragment = document.createDocumentFragment()
+        chars.forEach((char, i) => {
+            const count = missCounts[i] || 0
+            const span = document.createElement("span")
+            span.textContent = char
+            if (count === 1) {
+                span.className = "bg-red-500/25 rounded-sm"
+            } else if (count === 2) {
+                span.className = "bg-red-500/50 rounded-sm text-red-100"
+            } else if (count >= 3) {
+                span.className = "bg-red-500/75 rounded-sm text-white"
+            }
+            fragment.appendChild(span)
+        })
+
+        this.heatmapBodyTarget.innerHTML = ""
+        this.heatmapBodyTarget.appendChild(fragment)
+        this.missHeatmapTarget.classList.remove("hidden")
+    }
+
+    // 紙吹雪を打ち上げる（ブランドカラー寄り）
+    fireConfetti() {
+        const colors = ["#22c55e", "#16a34a", "#86efac", "#f9fafb", "#fde047"]
+        confetti({
+            particleCount: 90,
+            spread: 75,
+            startVelocity: 35,
+            origin: { y: 0.35 },
+            colors
+        })
+        // 少し遅らせて左右からの追い打ち
+        setTimeout(() => {
+            confetti({ particleCount: 40, angle: 60, spread: 55, origin: { x: 0, y: 0.6 }, colors })
+            confetti({ particleCount: 40, angle: 120, spread: 55, origin: { x: 1, y: 0.6 }, colors })
+        }, 200)
+    }
+
     // 途中終了時に保存するかの選択で「保存する」を選んだ場合の処理
     saveManually() {
         const articleText = sessionStorage.getItem("typing_text")
@@ -105,6 +208,7 @@ export default class extends Controller {
             if (data.status === "saved") {
                 this.saveSuccessTarget.classList.remove("hidden")
                 this.saveButtonTarget.classList.add("hidden")
+                if (data.achievements?.length > 0) this.showAchievements(data.achievements)
             } else {
                 this.saveFailedTarget.classList.remove("hidden")
             }
@@ -159,9 +263,9 @@ export default class extends Controller {
 
     showAchievements(achievements) {
         const container = this.achievementBannersTarget
-        achievements.forEach(a => {
+        achievements.forEach((a, i) => {
             const el = document.createElement("div")
-            el.className = "flex justify-center"
+            el.className = "flex justify-center opacity-0 scale-90 transition-all duration-300 ease-out"
             el.innerHTML = `
                 <div class="inline-flex items-center gap-2 rounded-full bg-gray-800 border border-green-700 px-4 py-2 text-sm font-bold text-green-400">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -171,7 +275,15 @@ export default class extends Controller {
                 </div>
             `
             container.appendChild(el)
+            // ステージング（順番に弾むように登場）
+            setTimeout(() => {
+                el.classList.remove("opacity-0", "scale-90")
+                el.classList.add("opacity-100", "scale-100")
+            }, 80 + i * 160)
         })
+        if (achievements.length > 0) {
+            this.fireConfetti()
+        }
     }
 
     copyResult() {
