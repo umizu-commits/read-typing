@@ -1,6 +1,6 @@
 <%# 履歴テーブル（Turbo Frame でページネーション時にスクロール位置維持） %>
 <turbo-frame id="history-table" data-turbo-action="advance" class="block">
-  <div class="bg-gray-900 rounded-xl border border-gray-800 shadow-sm overflow-hidden">
+  <div class="bg-gray-900 rounded-xl border border-gray-800 shadow-xl ring-1 ring-white/5 overflow-hidden">
     <% if @typing_results.empty? %>
       <div class="p-10 text-center">
         <p class="text-sm font-bold text-gray-200 mb-1">まだ履歴がありません</p>
