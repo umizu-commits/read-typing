@@ -12,7 +12,7 @@
 
     <%# 通常完了メッセージ（デフォルト表示） %>
     <div data-result-target="completedMessage" class="text-center mb-8">
-      <%# トロフィーバッジ %>
+      <%# ランクバッジ %>
       <div class="relative flex justify-center mb-6">
         <%# グロー %>
         <div class="absolute w-24 h-24 rounded-full bg-green-500 opacity-20 blur-2xl"></div>
@@ -21,9 +21,7 @@
         <div class="absolute w-24 h-24 rounded-full border border-green-500/40 scale-[1.18]"></div>
         <%# メインバッジ %>
         <div class="relative w-24 h-24 rounded-full bg-gray-800 border-2 border-green-500 flex items-center justify-center">
-          <svg class="w-12 h-12 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0" />
-          </svg>
+          <span data-result-target="rankLetter" class="text-5xl font-black text-green-400 leading-none opacity-0 scale-50">--</span>
         </div>
       </div>
       <h1 class="text-3xl font-bold text-gray-100 mb-2">練習完了！お疲れ様でした。</h1>
@@ -132,6 +130,17 @@
         </div>
         <div data-result-target="elapsedTime" class="text-4xl font-bold text-gray-100 text-center">--:--</div>
       </div>
+    </div>
+
+    <%# ミス位置ヒートマップ %>
+    <div data-result-target="missHeatmap"
+         class="hidden bg-gray-900 border border-gray-800 rounded-xl p-5 mb-6">
+      <div class="flex items-baseline justify-between mb-2">
+        <h3 class="text-sm font-bold text-gray-300">ミスした箇所</h3>
+        <p class="text-xs text-gray-500">赤いハイライトが濃いほど何度もミスした箇所です</p>
+      </div>
+      <div data-result-target="heatmapBody"
+           class="font-mono text-sm text-gray-300 whitespace-pre-wrap break-words leading-relaxed max-h-[200px] overflow-auto bg-gray-800 rounded-lg p-3"></div>
     </div>
 
     <%# 記事タイトル（全幅） %>
