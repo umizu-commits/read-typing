@@ -19,8 +19,19 @@ class TypingHistoriesController < ApplicationController
     end
 
     # グラフ用データをインラインで生成（別途AJAXリクエスト不要）
-    chart_results = @all_typing_results.order(created_at: :desc).limit(30).pluck(:created_at, :cpm).reverse
-    @chart_data = chart_results.map { |created_at, cpm| [ created_at.strftime("%-m/%-d"), cpm ] }
+    chart_results = @all_typing_results.order(created_at: :desc).limit(30).includes(:article).to_a.reverse
+    best_cpm = chart_results.map(&:cpm).max
+    @chart_data = chart_results.map do |r|
+      title = r.article_title.presence || r.article&.title.presence
+      {
+        label: r.created_at.strftime("%-m/%-d"),
+        full_label: r.created_at.strftime("%Y/%m/%d %H:%M"),
+        cpm: r.cpm,
+        accuracy: r.accuracy,
+        title: title,
+        is_best: chart_results.size > 1 && r.cpm == best_cpm
+      }
+    end
 
     # 実績: 未通知を取得してから既読マーク
     @new_achievements = current_user.user_achievements.where(notified_at: nil).to_a
