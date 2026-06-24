@@ -18,8 +18,14 @@ class TypingHistoriesController < ApplicationController
       @accuracy_diff = @latest_result.accuracy - @prev_result.accuracy
     end
 
+    # 期間フィルタ（7d / 30d / all、デフォルトは 30d）
+    @current_period = params[:period].presence_in(%w[7d 30d all]) || "30d"
+
     # グラフ用データをインラインで生成（別途AJAXリクエスト不要）
-    chart_results = @all_typing_results.order(created_at: :desc).limit(30).includes(:article).to_a.reverse
+    chart_scope = @all_typing_results.order(created_at: :desc)
+    chart_scope = chart_scope.where(created_at: 7.days.ago..) if @current_period == "7d"
+    chart_scope = chart_scope.where(created_at: 30.days.ago..) if @current_period == "30d"
+    chart_results = chart_scope.limit(100).includes(:article).to_a.reverse
     best_cpm = chart_results.map(&:cpm).max
     @chart_data = chart_results.map do |r|
       title = r.article_title.presence || r.article&.title.presence
@@ -31,6 +37,23 @@ class TypingHistoriesController < ApplicationController
         title: title,
         is_best: chart_results.size > 1 && r.cpm == best_cpm
       }
+    end
+
+    # 継続ヒートマップ用データ（今年1月1日〜12月31日、起点を日曜・終点を土曜にパディングして矩形化）
+    today = Date.current
+    target_start = Date.new(today.year, 1, 1)
+    target_end = Date.new(today.year, 12, 31)
+    padded_start = target_start - target_start.wday
+    padded_end = target_end + (6 - target_end.wday)
+    created_ats = @all_typing_results
+      .where(created_at: target_start.beginning_of_day..today.end_of_day)
+      .pluck(:created_at)
+    daily_counts = Hash.new(0)
+    created_ats.each { |ts| daily_counts[ts.to_date] += 1 }
+    @heatmap_days = (padded_start..padded_end).map do |date|
+      in_year = date >= target_start && date <= target_end
+      in_range = in_year && date <= today
+      { date: date, count: in_range ? daily_counts[date] : 0, in_range: in_range, in_year: in_year }
     end
 
     # 実績: 未通知を取得してから既読マーク
