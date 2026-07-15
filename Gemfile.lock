@@ -398,6 +398,13 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 4.0)
       websocket (~> 1.0)
+    sentry-rails (6.6.2)
+      railties (>= 5.2.0)
+      sentry-ruby (~> 6.6.2)
+    sentry-ruby (6.6.2)
+      bigdecimal
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      logger
     snaky_hash (2.0.5)
       hashie (>= 0.1.0, < 6)
       version_gem (>= 1.1.8, < 3)
@@ -493,6 +500,7 @@ DEPENDENCIES
   rubocop-rails (~> 2.35)
   rubocop-rails-omakase
   selenium-webdriver
+  sentry-rails
   sprockets-rails
   ssrf_filter
   stimulus-rails
