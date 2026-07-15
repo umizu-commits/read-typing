@@ -29,5 +29,7 @@ module App
     # config.eager_load_paths << Rails.root.join("extras")
 
     config.i18n.default_locale = :ja
+
+    config.active_storage.variant_processor = :disabled
   end
 end
