@@ -7,13 +7,13 @@
     <!-- OG -->
     <meta property="og:title" content="<%= content_for(:og_title) || "ReadTyping" %>">
     <meta property="og:description" content="<%= content_for(:og_description) || "興味関心のある記事でタイピング練習ができるWebアプリです。" %>">
-    <meta property="og:image" content="https://read-typing-web.onrender.com/og-image.png"> <!-- ドメイン変更時に要変更 -->
-    <meta property="og:url" content="https://read-typing-web.onrender.com/"> <!-- ドメイン変更時に要変更 -->
+    <meta property="og:image" content="<%= "#{Rails.configuration.x.app_url}/og-image.png" %>">
+    <meta property="og:url" content="<%= Rails.configuration.x.app_url %>/">
     <meta property="og:type" content="website">
     <!-- Twitter Card用 -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="<%= content_for(:twitter_title) || "ReadTyping" %>">
-    <meta name="twitter:image" content="https://read-typing-web.onrender.com/og-image.png">
+    <meta name="twitter:image" content="<%= "#{Rails.configuration.x.app_url}/og-image.png" %>">
 
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
