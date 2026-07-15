@@ -24,7 +24,7 @@ class TypingFlowTest < ApplicationSystemTestCase
     page.execute_script("sessionStorage.setItem('typing_text', 'ab')")
     visit typing_path
 
-    find("textarea[data-typing-target='input']").send_keys("a", "b")
+    type_text("a", "b", total: 2)
 
     assert_current_path typing_result_path
     assert_text "練習完了！お疲れ様でした。"
@@ -35,9 +35,19 @@ class TypingFlowTest < ApplicationSystemTestCase
     page.execute_script("sessionStorage.setItem('typing_text', 'a b')")
     visit typing_path
 
-    find("textarea[data-typing-target='input']").send_keys("a", "b")
+    type_text("a", "b", total: 3)
 
     assert_current_path typing_result_path
     assert_text "練習完了！お疲れ様でした。"
+  end
+
+  private
+
+  def type_text(*keys, total:)
+    assert_selector("[data-typing-target='text'] .typing-char", count: total)
+
+    input = find("textarea[data-typing-target='input']", visible: :all)
+    page.execute_script("arguments[0].classList.remove('opacity-0')", input)
+    input.send_keys(*keys)
   end
 end
