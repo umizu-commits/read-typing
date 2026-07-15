@@ -1,5 +1,5 @@
 <%# サマリーカード（全件を対象に集計） %>
-<% if @all_typing_results.any? %>
+<% if @typing_history_summary.any_results? %>
 
   <%# メインカード: CPM + 正答率（主役） %>
   <div class="grid grid-cols-2 gap-4 mb-4">
@@ -14,13 +14,13 @@
         </div>
         <div class="text-xs font-bold text-gray-400">CPM</div>
       </div>
-      <div class="text-4xl font-bold text-gray-100 text-center"><%= @latest_result.cpm %></div>
+      <div class="text-4xl font-bold text-gray-100 text-center"><%= @typing_history_summary.latest_result.cpm %></div>
       <div class="text-center mt-2">
-        <% if @cpm_diff %>
-          <% if @cpm_diff > 0 %>
-            <span class="text-xs font-bold text-green-500">前回比 +<%= @cpm_diff %></span>
-          <% elsif @cpm_diff < 0 %>
-            <span class="text-xs font-bold text-red-400">前回比 <%= @cpm_diff %></span>
+        <% if @typing_history_summary.cpm_difference %>
+          <% if @typing_history_summary.cpm_difference > 0 %>
+            <span class="text-xs font-bold text-green-500">前回比 +<%= @typing_history_summary.cpm_difference %></span>
+          <% elsif @typing_history_summary.cpm_difference < 0 %>
+            <span class="text-xs font-bold text-red-400">前回比 <%= @typing_history_summary.cpm_difference %></span>
           <% else %>
             <span class="text-xs font-bold text-gray-400">前回比 ±0</span>
           <% end %>
@@ -29,7 +29,7 @@
         <% end %>
       </div>
       <div class="text-center text-xs text-gray-500 mt-2">
-        WPM目安: <%= @latest_result.wpm %>
+        WPM目安: <%= @typing_history_summary.latest_result.wpm %>
       </div>
     </div>
 
@@ -43,13 +43,13 @@
         </div>
         <div class="text-xs font-bold text-gray-400">正答率</div>
       </div>
-      <div class="text-4xl font-bold text-gray-100 text-center"><%= @latest_result.accuracy %>%</div>
+      <div class="text-4xl font-bold text-gray-100 text-center"><%= @typing_history_summary.latest_result.accuracy %>%</div>
       <div class="text-center mt-2">
-        <% if @accuracy_diff %>
-          <% if @accuracy_diff > 0 %>
-            <span class="text-xs font-bold text-green-500">前回比 +<%= @accuracy_diff %>%</span>
-          <% elsif @accuracy_diff < 0 %>
-            <span class="text-xs font-bold text-red-400">前回比 <%= @accuracy_diff %>%</span>
+        <% if @typing_history_summary.accuracy_difference %>
+          <% if @typing_history_summary.accuracy_difference > 0 %>
+            <span class="text-xs font-bold text-green-500">前回比 +<%= @typing_history_summary.accuracy_difference %>%</span>
+          <% elsif @typing_history_summary.accuracy_difference < 0 %>
+            <span class="text-xs font-bold text-red-400">前回比 <%= @typing_history_summary.accuracy_difference %>%</span>
           <% else %>
             <span class="text-xs font-bold text-gray-400">前回比 ±0%</span>
           <% end %>
@@ -75,12 +75,11 @@
         </div>
         <div class="text-xs font-bold text-gray-400">累積文字数</div>
       </div>
-      <% total_chars = @all_typing_results.sum(:correct_count) %>
       <div class="text-2xl font-bold text-gray-100 text-center">
-        <% if total_chars >= 10000 %>
-          <%= (total_chars / 10000.0).round(1) %>万字
+        <% if @typing_history_summary.total_correct_count >= 10000 %>
+          <%= (@typing_history_summary.total_correct_count / 10000.0).round(1) %>万字
         <% else %>
-          <%= total_chars %>字
+          <%= @typing_history_summary.total_correct_count %>字
         <% end %>
       </div>
     </div>
@@ -95,9 +94,8 @@
         </div>
         <div class="text-xs font-bold text-gray-400">総練習時間</div>
       </div>
-      <% total_seconds = @all_typing_results.sum(:elapsed_time) %>
-      <% hours = total_seconds / 3600 %>
-      <% minutes = (total_seconds % 3600) / 60 %>
+      <% hours = @typing_history_summary.total_elapsed_time / 3600 %>
+      <% minutes = (@typing_history_summary.total_elapsed_time % 3600) / 60 %>
       <div class="text-2xl font-bold text-gray-100 text-center">
         <% if hours > 0 %>
           <%= hours %>h <%= minutes %>m
@@ -117,7 +115,7 @@
         </div>
         <div class="text-xs font-bold text-gray-400">完了セッション</div>
       </div>
-      <div class="text-2xl font-bold text-gray-100 text-center"><%= @all_typing_results.count %> 回</div>
+      <div class="text-2xl font-bold text-gray-100 text-center"><%= @typing_history_summary.total_sessions %> 回</div>
     </div>
 
     <%# 平均ミス回数 %>
@@ -130,14 +128,14 @@
         </div>
         <div class="text-xs font-bold text-gray-400">平均ミス回数</div>
       </div>
-      <div class="text-2xl font-bold text-gray-100 text-center"><%= @all_typing_results.average(:miss_count).to_f.round(1) %></div>
+      <div class="text-2xl font-bold text-gray-100 text-center"><%= @typing_history_summary.average_miss_count %></div>
     </div>
 
   </div>
 <% end %>
 
 <%# CPM推移グラフ %>
-<% if @all_typing_results.any? %>
+<% if @typing_history_summary.any_results? %>
   <div class="bg-gray-900 rounded-xl border border-gray-800 shadow-xl ring-1 ring-white/5 p-4 mb-6">
     <div class="flex items-start justify-between gap-3 mb-3">
       <div>
@@ -148,18 +146,18 @@
       <div class="flex gap-1 shrink-0">
         <% { "7d" => "直近7日", "30d" => "直近30日", "all" => "全期間" }.each do |key, label| %>
           <%= link_to label, typing_histories_path(tab: :summary, period: key),
-              class: "px-3 py-1.5 rounded-lg text-xs font-bold transition-colors #{key == @current_period ? 'bg-green-700 text-gray-950' : 'border border-gray-700 text-gray-400 hover:bg-gray-800'}" %>
+              class: "px-3 py-1.5 rounded-lg text-xs font-bold transition-colors #{key == @typing_history_summary.current_period ? 'bg-green-700 text-gray-950' : 'border border-gray-700 text-gray-400 hover:bg-gray-800'}" %>
         <% end %>
       </div>
     </div>
-    <% if @chart_data.empty? %>
+    <% if @typing_history_summary.chart_data.empty? %>
       <div class="h-[280px] flex items-center justify-center text-sm text-gray-500">
         この期間の練習記録がありません
       </div>
     <% else %>
       <div style="height:280px; position:relative;">
         <canvas data-controller="chart"
-                data-chart-data-value="<%= @chart_data.to_json %>"></canvas>
+                data-chart-data-value="<%= @typing_history_summary.chart_data.to_json %>"></canvas>
       </div>
     <% end %>
   </div>
@@ -169,10 +167,10 @@
     <div class="flex items-start justify-between mb-4">
       <div>
         <h2 class="text-base font-bold text-gray-100">練習継続マップ</h2>
-        <p class="text-xs text-gray-400 mt-1"><%= Date.current.year %>年の練習回数。色が濃いほど多く練習した日です。</p>
+        <p class="text-xs text-gray-400 mt-1"><%= @typing_history_summary.year %>年の練習回数。色が濃いほど多く練習した日です。</p>
       </div>
       <span class="inline-flex items-center rounded-full bg-gray-800 text-gray-300 px-3 py-1 text-xs font-bold shrink-0">
-        <%= Date.current.year %>年
+        <%= @typing_history_summary.year %>年
       </span>
     </div>
 
@@ -186,7 +184,7 @@
 
       <%# ヒートマップ本体 %>
       <div class="grid grid-flow-col gap-1" style="grid-template-rows: repeat(7, 1rem); grid-auto-columns: 1rem;">
-        <% @heatmap_days.each do |day| %>
+        <% @typing_history_summary.heatmap_days.each do |day| %>
           <% if day[:in_range] %>
             <% bg = case day[:count]
                     when 0 then "bg-gray-800"
@@ -211,10 +209,8 @@
 
     <%# 凡例 + サマリー %>
     <div class="flex items-center justify-between mt-4">
-      <% active_days = @heatmap_days.count { |d| d[:in_range] && d[:count] > 0 } %>
-      <% total_count = @heatmap_days.sum { |d| d[:in_range] ? d[:count] : 0 } %>
       <div class="text-xs text-gray-400">
-        今年は <span class="font-bold text-green-400"><%= active_days %></span> 日練習・計 <span class="font-bold text-green-400"><%= total_count %></span> 回
+        今年は <span class="font-bold text-green-400"><%= @typing_history_summary.heatmap_active_days %></span> 日練習・計 <span class="font-bold text-green-400"><%= @typing_history_summary.heatmap_total_count %></span> 回
       </div>
       <div class="flex items-center gap-2 text-[10px] text-gray-500">
         <span>少</span>

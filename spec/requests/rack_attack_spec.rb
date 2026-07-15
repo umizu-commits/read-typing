@@ -1,11 +1,20 @@
 require 'rails_helper'
 
 RSpec.describe "Rack::Attack", type: :request do
-  before do
+  around do |example|
+    original_store = Rack::Attack.cache.store
     Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new
-    allow_any_instance_of(ArticleHtmlFetcher).to receive(:call).and_return(
-      double(success?: false, error_message: "テスト用エラー")
-    )
+
+    example.run
+  ensure
+    Rack::Attack.cache.store = original_store
+  end
+
+  let(:fetcher) { instance_double(ArticleHtmlFetcher) }
+
+  before do
+    allow(ArticleHtmlFetcher).to receive(:new).and_return(fetcher)
+    allow(fetcher).to receive(:call).and_return(double(success?: false, error_message: "テスト用エラー"))
   end
 
   describe "POST /articles のレート制限" do

@@ -1,0 +1,25 @@
+<div data-controller="typing-form url-form" class="bg-gray-900 rounded-xl border border-gray-800 shadow-xl ring-1 ring-white/5 p-5 max-w-2xl mx-auto">
+  <div class="flex border-b border-gray-800 mb-4">
+    <button type="button"
+            data-url-form-target="urlTab"
+            data-action="click->url-form#showUrl"
+            class="px-4 py-2 text-sm font-bold border-b-2 border-green-500 text-green-500">
+      URLから取得
+    </button>
+    <button type="button"
+            data-url-form-target="textTab"
+            data-action="click->url-form#showText"
+            class="px-4 py-2 text-sm font-bold border-b-2 border-transparent text-gray-500">
+      テキストを貼り付け
+    </button>
+  </div>
+
+  <%= render "static_pages/url_form" %>
+  <%= render "static_pages/text_form" %>
+
+  <div class="flex justify-center gap-6 mt-4 text-sm text-green-500">
+    <span>✓ WPM計測</span>
+    <span>✓ ミスカウント表示</span>
+    <span>✓ ログイン不要ですぐ開始</span>
+  </div>
+</div>

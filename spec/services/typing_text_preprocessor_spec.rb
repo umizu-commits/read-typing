@@ -55,6 +55,19 @@ RSpec.describe TypingTextPreprocessor do
       end
     end
 
+    context "本文が最大長以下のとき" do
+      it "句点以降の本文を保持する" do
+        first_sentence = ("a" * 50) + "。"
+        trailing_text = "b" * 50
+        input = "#{first_sentence}#{trailing_text}"
+
+        result = described_class.new(input).call
+
+        expect(result.success?).to be(true)
+        expect(result.body).to eq(input)
+      end
+    end
+
     context "本文が最大長を超えるとき" do
       it "句点がなければ最大長で切り詰める" do
         input = "a" * (described_class::MAX_BODY_LENGTH + 1)

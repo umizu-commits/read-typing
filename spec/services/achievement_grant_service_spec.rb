@@ -70,9 +70,15 @@ RSpec.describe AchievementGrantService do
         end
       end
 
-      [ [ 10_000, "chars_10000" ], [ 100_000, "chars_100000" ] ].each do |correct_count, achievement_key|
+      [ [ 10_000, 1, "chars_10000" ], [ 100_000, 10, "chars_100000" ] ].each do |correct_count, result_count, achievement_key|
         context "累計正解文字数が#{correct_count}字の場合" do
-          before { create(:typing_result, user: user, correct_count: correct_count) }
+          before do
+            bulk_create_typing_results(
+              result_count,
+              correct_count: 10_000,
+              article_text: "a" * 10_000
+            )
+          end
 
           it "#{achievement_key}が付与される" do
             expect(grant_keys(context: :typing_saved)).to include(achievement_key)
@@ -174,6 +180,16 @@ RSpec.describe AchievementGrantService do
         end
       end
 
+      context "アプリケーションのタイムゾーンで日付が変わった場合" do
+        it "Date.current を基準にストリークを判定する" do
+          create(:typing_result, user: user, created_at: Time.zone.local(2025, 12, 31, 12, 0, 0))
+          allow(Date).to receive(:current).and_return(Date.new(2026, 1, 2))
+          allow(Date).to receive(:today).and_return(Date.new(2026, 1, 1))
+
+          expect(service.send(:current_streak)).to eq(0)
+        end
+      end
+
       context "今日・昨日の2日連続の場合（1日猶予ルール）" do
         before do
           travel_to(1.day.ago) { create(:typing_result, user: user) }
@@ -236,6 +252,13 @@ RSpec.describe AchievementGrantService do
       it "2回目の呼び出しでは付与されない" do
         grant_keys(context: :sns_shared)
         expect(grant_keys(context: :sns_shared)).not_to include("sns_share")
+      end
+
+      it "初期化後に別リクエストで付与済みになった実績は再通知しない" do
+        concurrent_service = described_class.new(user)
+        user.user_achievements.create!(achievement_key: "sns_share", achieved_at: Time.current)
+
+        expect(concurrent_service.call(context: :sns_shared)).to be_empty
       end
     end
 

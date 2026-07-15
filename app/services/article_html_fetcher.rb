@@ -1,4 +1,5 @@
 require "ssrf_filter"
+require "uri"
 
 class ArticleHtmlFetcher
   USER_AGENT = "ReadTyping/1.0 (+https://github.com/umizu-commits/read-typing)"
@@ -12,6 +13,8 @@ class ArticleHtmlFetcher
   end
 
   def call
+    return error_result("アクセスできないURLです") unless valid_http_url?
+
     buffer = +""  # ミュータブルな空文字列（+ はフリーズしない文字列を作る）
 
     response = SsrfFilter.get(
@@ -55,6 +58,8 @@ class ArticleHtmlFetcher
     error_result("応答が遅すぎます")
   rescue OpenSSL::SSL::SSLError
     error_result("SSL通信に失敗しました")
+  rescue URI::Error, ArgumentError
+    error_result("アクセスできないURLです")
   rescue SsrfFilter::Error
     error_result("アクセスできないURLです")
   end
@@ -67,5 +72,12 @@ class ArticleHtmlFetcher
 
   def error_result(message)
     Result.new(success?: false, html: nil, error_message: message)
+  end
+
+  def valid_http_url?
+    uri = URI.parse(@url.to_s)
+    uri.is_a?(URI::HTTP) && uri.host.present?
+  rescue URI::InvalidURIError
+    false
   end
 end

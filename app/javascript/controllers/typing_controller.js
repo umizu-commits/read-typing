@@ -1,9 +1,22 @@
 import { Controller } from "@hotwired/stimulus"
 
 const SPAN_BASE = "typing-char"
+const KEY_CODE_TO_KEY = {
+  "KeyA": "a", "KeyB": "b", "KeyC": "c", "KeyD": "d", "KeyE": "e", "KeyF": "f",
+  "KeyG": "g", "KeyH": "h", "KeyI": "i", "KeyJ": "j", "KeyK": "k", "KeyL": "l",
+  "KeyM": "m", "KeyN": "n", "KeyO": "o", "KeyP": "p", "KeyQ": "q", "KeyR": "r",
+  "KeyS": "s", "KeyT": "t", "KeyU": "u", "KeyV": "v", "KeyW": "w", "KeyX": "x",
+  "KeyY": "y", "KeyZ": "z",
+  "Digit0": "0", "Digit1": "1", "Digit2": "2", "Digit3": "3", "Digit4": "4",
+  "Digit5": "5", "Digit6": "6", "Digit7": "7", "Digit8": "8", "Digit9": "9",
+  "Minus": "-", "Equal": "=", "BracketLeft": "[", "BracketRight": "]",
+  "Backslash": "\\", "Semicolon": ";", "Quote": "'", "Comma": ",",
+  "Period": ".", "Slash": "/", "Backquote": "`", "Space": " ",
+  "Enter": "Enter", "ShiftLeft": "Shift", "ShiftRight": "ShiftRight"
+}
 
 export default class extends Controller {
-  static targets = ["text", "input","hint" ,"timer", "typedWindow", "progressBar", "progressText", "totalText", "title","progressPercent", "keyboard", "skipModeButton", "missFlash"]
+  static targets = ["text", "input", "hint", "timer", "typedWindow", "progressBar", "progressText", "totalText", "title", "progressPercent", "keyboard", "skipModeButton", "missFlash"]
 
   connect() {
     const text = sessionStorage.getItem("typing_text")
@@ -13,7 +26,6 @@ export default class extends Controller {
       return
     }
 
-    // article_titleを読み取り、タイトル表示エリアに反映
     const title = sessionStorage.getItem("article_title") || ""
     if (this.hasTitleTarget) {
       this.titleTarget.textContent = title
@@ -22,191 +34,67 @@ export default class extends Controller {
       }
     }
 
-    this.chars = [...text] // handleInput() の中でも元のテキストを参照できるよう、this.chars に保存
+    this.chars = [...text]
     this.totalTextTarget.textContent = this.chars.length
-    this.inputTarget.focus() // ページ表示と同時にフォーカスを当てる
+    this.renderText()
+    this.resetTimer()
+    this.initializePracticeState()
 
-    // 1文字ずつ span に変換して表示する
-    this.textTarget.innerHTML = ""
-
-    const fragment = document.createDocumentFragment()
-
-    this.chars.forEach(char => {
-      const span = document.createElement("span")
-      span.textContent = char // textContent は HTML として解釈しない
-      span.className = SPAN_BASE
-      fragment.appendChild(span)
-    })
-
-    this.textTarget.appendChild(fragment)
-
-    // 最初の入力でタイマーを開始するため、開始状態を未開始にしておく
-    this.isStarted = false
-    // タイピング開始時は先頭の文字から判定する
-    this.currentIndex = 0
-
-    // ミスのカウント
-    this.missCount = 0
-
-    // 各文字インデックスごとのミス回数（ヒートマップ用）
-    this.missIndices = []
-
-    // 正解数のカウント
-    this.correctCount = 0
-
-    // タイピング完了のフラグ
-    this.isCompleted = false
-
-    // タイピング中の文字（入力ウィンドウに表示）
-    this.typedText = ""
-
-    // タイマー用の状態
-    this.timerId = null
-    this.startTime = null
-    this.elapsedMilliseconds = 0
-    this.elapsedSeconds = 0
-    this.timerTarget.textContent = "00:00"
-
-    // スキップモードの状態
     this.skipModeEnabled = false
-
-    // スキップした文字数のカウント
-    this.skippedCount = 0
-
     this.skipNonTypableChars()
-
-    //現在地にカーソルを表示する
     this.updateCursor()
+    this.inputTarget.focus()
   }
 
-  // キーが押されたときの処理
   handleKeydown(event) {
-    const codeToKey = {
-      "KeyA":"a","KeyB":"b","KeyC":"c","KeyD":"d","KeyE":"e","KeyF":"f",
-      "KeyG":"g","KeyH":"h","KeyI":"i","KeyJ":"j","KeyK":"k","KeyL":"l",
-      "KeyM":"m","KeyN":"n","KeyO":"o","KeyP":"p","KeyQ":"q","KeyR":"r",
-      "KeyS":"s","KeyT":"t","KeyU":"u","KeyV":"v","KeyW":"w","KeyX":"x",
-      "KeyY":"y","KeyZ":"z",
-      "Digit0":"0","Digit1":"1","Digit2":"2","Digit3":"3","Digit4":"4",
-      "Digit5":"5","Digit6":"6","Digit7":"7","Digit8":"8","Digit9":"9",
-      "Minus":"-","Equal":"=","BracketLeft":"[","BracketRight":"]",
-      "Backslash":"\\","Semicolon":";","Quote":"'","Comma":",",
-      "Period":".","Slash":"/","Backquote":"`","Space":" ",
-      "Enter":"Enter","ShiftLeft":"Shift","ShiftRight":"ShiftRight"
-    }
-
-    const keyValue = codeToKey[event.code] ?? event.key.toLowerCase()
+    const keyValue = KEY_CODE_TO_KEY[event.code] ?? event.key.toLowerCase()
     const pressedKeyEl = this.keyboardTarget.querySelector(`[data-key="${keyValue}"]`)
     if (pressedKeyEl) {
       pressedKeyEl.classList.add('!bg-gray-500', '!text-white', '!scale-90')
-      // Shiftは長押し中ハイライトを維持し、keyupで解除する
+      // Shiftは長押し中ハイライトを維持し、keyupで解除する。
       const isShift = event.code === "ShiftLeft" || event.code === "ShiftRight"
       if (!isShift) {
         setTimeout(() => pressedKeyEl.classList.remove('!bg-gray-500', '!text-white', '!scale-90'), 120)
       }
     }
 
-    // IME変換中はすべてスキップ
     if (event.isComposing) return
 
-    // Enterキーを無効にする部分
     if (event.key === "Enter") {
       event.preventDefault()
       return
     }
 
-    // BackSpaceキーを無効にする
     if (event.key === "Backspace") {
       event.preventDefault()
-      this.typedText = this.typedText.slice(0, -1)
-      this.typedWindowTarget.textContent = this.typedText
+      this.setTypedText(this.typedText.slice(0, -1))
       return
     }
 
-    // ShiftやCtrlなどを無視する部分
     if (event.key.length !== 1) return
 
-    //スペースキーは無視する
     if (event.key === " ") {
       event.preventDefault()
       if (this.skipModeEnabled && !this.isCompleted && this.isSkippableChar(this.chars[this.currentIndex])) {
-        if (!this.isStarted) {
-          this.isStarted = true
-          this.startTimer()
-          this.hintTarget.classList.add("hidden")
-        }
-        const spans = this.textTarget.querySelectorAll("span")
-        spans[this.currentIndex].className = `${SPAN_BASE} text-gray-300 line-through`
-        this.skippedCount++
-        this.currentIndex++
-        this.skipNonTypableChars()
-        this.updateCursor()
-
-        if (this.currentIndex >= this.chars.length) {
-          this.isCompleted = true
-          this.stopTimer()
-          this.saveResult("completed")
-          window.location.href = "/typing/result"
-        }
+        this.skipCurrentCharacter()
       }
       return
     }
 
-    // textareaへの文字蓄積を防ぐ
-    event.preventDefault() // デフォルトのキー入力を無効にする
+    event.preventDefault()
 
     if (this.isCompleted) return
 
-    // 最初の入力時だけ、開始済みにしてヒントを非表示にする
-    if (!this.isStarted) {
-      this.isStarted = true
-      this.startTimer()
-      this.hintTarget.classList.add("hidden")
-    }
-
-    // 入力されたキーと期待される文字を取得する部分
-    const key = event.key // event.key は押されたキーの文字を返す（例: "a": Key A)
-    const expectedChar = this.chars[this.currentIndex] // 本来入力してほしい文字
-
-    // 入力されたキーが期待される文字と一致する場合、次の文字に進む
+    const key = event.key
     const spans = this.textTarget.querySelectorAll("span")
-    if (key === expectedChar) {
-      spans[this.currentIndex].className = `${SPAN_BASE} text-gray-400`
-      this.currentIndex++
-      this.correctCount++
-      this.skipNonTypableChars()
-      this.updateCursor()
-
-      if (this.currentIndex >= this.chars.length) {
-        this.isCompleted = true // タイピング完了のフラグを立てる
-        this.stopTimer()
-        this.saveResult("completed")
-        window.location.href = "/typing/result" // 完了時に自動で結果画面へ遷移する
-      }
-    } else {
-      this.missCount++ // ミスをカウントする
-      this.missIndices.push(this.currentIndex)
-      const missSpan = spans[this.currentIndex]
-      missSpan.className = `${SPAN_BASE} text-red-500 underline decoration-red-300 decoration-2`
-      this.shakeChar(missSpan)
-      this.flashMiss()
-    }
-    this.typedText += key // 入力されたキーをTypedTextに追記
-    this.typedWindowTarget.textContent = this.typedText // 入力ウィンドウに反映
+    this.handleTypedCharacter(key, spans)
+    this.setTypedText(this.typedText + key)
   }
 
-  // リセットボタンのイベントハンドラ
   reset() {
     this.resetTimer()
-
     this.inputTarget.value = ""
-    this.isStarted = false
-    this.currentIndex = 0
-    this.missCount = 0
-    this.missIndices = []
-    this.correctCount = 0
-    this.skippedCount = 0
-    this.isCompleted = false
+    this.initializePracticeState()
 
     this.textTarget.querySelectorAll("span").forEach(span => {
       span.className = SPAN_BASE
@@ -216,7 +104,92 @@ export default class extends Controller {
     this.updateCursor()
     this.hintTarget.classList.remove("hidden")
     this.inputTarget.focus()
-    this.updateProgress()
+  }
+
+  initializePracticeState() {
+    this.isStarted = false
+    this.currentIndex = 0
+    this.missCount = 0
+    this.missIndices = []
+    this.correctCount = 0
+    this.isCompleted = false
+    this.skippedCount = 0
+    this.setTypedText("")
+  }
+
+  renderText() {
+    this.textTarget.innerHTML = ""
+    const fragment = document.createDocumentFragment()
+
+    this.chars.forEach(char => {
+      const span = document.createElement("span")
+      span.textContent = char
+      span.className = SPAN_BASE
+      fragment.appendChild(span)
+    })
+
+    this.textTarget.appendChild(fragment)
+  }
+
+  setTypedText(text) {
+    this.typedText = text
+    this.typedWindowTarget.textContent = text
+  }
+
+  startPractice() {
+    if (this.isStarted) return
+
+    this.isStarted = true
+    this.startTimer()
+    this.hintTarget.classList.add("hidden")
+  }
+
+  handleTypedCharacter(char, spans) {
+    this.startPractice()
+
+    if (char === this.chars[this.currentIndex]) {
+      this.markCurrentCharacterCorrect(spans)
+    } else {
+      this.markCurrentCharacterMissed(spans)
+    }
+  }
+
+  markCurrentCharacterCorrect(spans) {
+    spans[this.currentIndex].className = `${SPAN_BASE} text-gray-400`
+    this.currentIndex++
+    this.correctCount++
+    this.skipNonTypableChars()
+    this.updateCursor()
+
+    if (this.currentIndex >= this.chars.length) this.completePractice()
+  }
+
+  markCurrentCharacterMissed(spans) {
+    this.missCount++
+    this.missIndices.push(this.currentIndex)
+    const missSpan = spans[this.currentIndex]
+    missSpan.className = `${SPAN_BASE} text-red-500 underline decoration-red-300 decoration-2`
+    this.shakeChar(missSpan)
+    this.flashMiss()
+  }
+
+  skipCurrentCharacter() {
+    this.startPractice()
+    const spans = this.textTarget.querySelectorAll("span")
+    spans[this.currentIndex].className = `${SPAN_BASE} text-gray-300 line-through`
+    this.skippedCount++
+    this.currentIndex++
+    this.skipNonTypableChars()
+    this.updateCursor()
+
+    if (this.currentIndex >= this.chars.length) this.completePractice()
+  }
+
+  completePractice() {
+    this.isCompleted = true
+    this.stopTimer()
+    this.saveResult("completed")
+    window.location.href = "/typing/result"
   }
 
   toggleSkipMode() {
@@ -311,20 +284,14 @@ export default class extends Controller {
   }
 
   handleCompositionStart() {
-    if (this.isStarted) return
-    this.isStarted = true
-    this.startTimer()
-    this.hintTarget.classList.add("hidden")
+    this.startPractice()
   }
 
-
   handleCompositionUpdate(event) {
-    // 変換中の文字に合わせて文字を表示する
     this.typedWindowTarget.textContent = event.data
   }
 
-  // IMEの確定時に呼ばれる
-  // handleKeydownは isComposing 中にスキップされるため、日本語入力の判定はこちらで処理する
+  // IME変換中のkeydownは判定しないため、確定した文字列をここで一文字ずつ処理する。
   handleCompositionEnd(event) {
     if (this.isCompleted) return
 
@@ -333,37 +300,11 @@ export default class extends Controller {
 
     for (const char of composed) {
       if (this.isCompleted) break
-
-      if (!this.isStarted) {
-        this.isStarted = true
-        this.startTimer()
-        this.hintTarget.classList.add("hidden")
-      }
-
-      if (char === this.chars[this.currentIndex]) {
-        spans[this.currentIndex].className = `${SPAN_BASE} text-gray-400`
-        this.currentIndex++
-        this.correctCount++
-        this.skipNonTypableChars()
-        this.updateCursor()
-
-        if (this.currentIndex >= this.chars.length) {
-          this.isCompleted = true
-          this.stopTimer()
-          this.saveResult("completed")
-          window.location.href = "/typing/result"
-        }
-      } else {
-        this.missCount++
-        this.missIndices.push(this.currentIndex)
-        const missSpan = spans[this.currentIndex]
-        missSpan.className = `${SPAN_BASE} text-red-500 underline decoration-red-300 decoration-2`
-        this.shakeChar(missSpan)
-        this.flashMiss()
-      }
+      this.handleTypedCharacter(char, spans)
     }
-    this.inputTarget.value = "" // 1回の変換確定後にtextareaをクリアすることで、次の変換開始時にカーソルが先頭に戻る
-    this.typedWindowTarget.textContent = "" // 確定時にクリア
+    // 確定後にtextareaを空にし、次のIME変換を先頭から始められるようにする。
+    this.inputTarget.value = ""
+    this.typedWindowTarget.textContent = ""
   }
 
   // タイマーを開始する

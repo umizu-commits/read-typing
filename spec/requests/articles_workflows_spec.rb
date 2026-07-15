@@ -4,8 +4,13 @@ RSpec.describe "記事の作成・取得・お気に入り", type: :request do
   let(:user) { create(:user) }
   let(:url) { "https://example.com/articles/1" }
 
-  before do
+  around do |example|
+    original_store = Rack::Attack.cache.store
     Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new
+
+    example.run
+  ensure
+    Rack::Attack.cache.store = original_store
   end
 
   describe "POST /articles" do
@@ -183,6 +188,15 @@ RSpec.describe "記事の作成・取得・お気に入り", type: :request do
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.parsed_body).to eq("error" => "テキストが短すぎます")
+    end
+  end
+
+  describe "POST /articles/fetch に不正なURLを渡した場合" do
+    it "500にせずエラーJSONを返す" do
+      post articles_fetch_path, params: { url: "http://[::1" }, as: :json
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.parsed_body).to eq("error" => "アクセスできないURLです")
     end
   end
 

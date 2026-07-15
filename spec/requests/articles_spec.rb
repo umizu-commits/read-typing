@@ -1,4 +1,5 @@
 require 'rails_helper'
+require "nokogiri"
 
 RSpec.describe "保存記事", type: :request do
   let(:user) { create(:user) }
@@ -35,6 +36,23 @@ RSpec.describe "保存記事", type: :request do
       it "記事が0件のとき「保存された記事がありません」と表示されること" do
         get articles_path
         expect(response.body).to include("保存された記事がありません")
+      end
+
+      it "自分の記事のタグとお気に入り状態だけを表示すること" do
+        favorited_article = create(:article, user: user, title: "お気に入り記事")
+        favorited_article.tags << Tag.create!(name: "自分のタグ")
+        unfavorited_article = create(:article, user: user, title: "通常記事")
+        other_user_article = create(:article, user: other_user, title: "他人の記事")
+        other_user_article.tags << Tag.create!(name: "他人のタグ")
+        Favorite.create!(user: user, article: favorited_article)
+
+        get articles_path
+
+        document = Nokogiri::HTML(response.body)
+        expect(response.body).to include("自分のタグ")
+        expect(response.body).not_to include("他人のタグ")
+        expect(document.at_css("#favorite-btn-#{favorited_article.id}").text).to include("お気に入り済み")
+        expect(document.at_css("#favorite-btn-#{unfavorited_article.id}").text).to include("お気に入り")
       end
 
       context "検索機能" do

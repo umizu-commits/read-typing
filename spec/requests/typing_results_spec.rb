@@ -39,6 +39,7 @@ RSpec.describe "タイピング結果保存", type: :request do
         post typing_results_path, params: valid_params.merge(
           article_id: article.id,
           article_title: "保存時タイトル",
+          article_text: "a" * 50,
           correct_count: 42
         )
 
@@ -82,6 +83,14 @@ RSpec.describe "タイピング結果保存", type: :request do
       it "存在しない記事を紐づけた結果は保存されない" do
         expect {
           post typing_results_path, params: valid_params.merge(article_id: 0)
+        }.not_to change(TypingResult, :count)
+
+        expect(response.parsed_body["status"]).to eq "failed"
+      end
+
+      it "本文より大きい正解文字数の結果は保存されない" do
+        expect {
+          post typing_results_path, params: valid_params.merge(correct_count: valid_params[:article_text].length + 1)
         }.not_to change(TypingResult, :count)
 
         expect(response.parsed_body["status"]).to eq "failed"

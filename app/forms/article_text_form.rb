@@ -19,16 +19,21 @@ class ArticleTextForm
       return false
     end
 
-    # url なし・source_type: :text で新規作成
-    @article = Article.create!(
-      body: preprocess_result.body,
-      title: title.presence,
-      source_type: :text,
-      user: user,
-      category: category
-    )
-    attach_tags(@article)
+    Article.transaction do
+      # url なし・source_type: :text で新規作成
+      @article = Article.create!(
+        body: preprocess_result.body,
+        title: title.presence,
+        source_type: :text,
+        user: user,
+        category: category
+      )
+      attach_tags(@article)
+    end
     true
+  rescue ActiveRecord::RecordInvalid => error
+    copy_record_errors(error.record)
+    false
   end
 
   def article

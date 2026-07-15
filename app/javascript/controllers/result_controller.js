@@ -35,9 +35,7 @@ export default class extends Controller {
 
         this.applyRank(result)
 
-        const articleText = sessionStorage.getItem("typing_text")
-        const articleTitle = sessionStorage.getItem("article_title") || ""
-        const articleId = sessionStorage.getItem("article_id") || null
+        const { articleText, articleTitle, articleId } = this.articleContext()
         if (articleTitle) {
             this.articleTitleTarget.classList.remove("hidden")
             this.articleTitleTextTarget.textContent = articleTitle
@@ -48,22 +46,11 @@ export default class extends Controller {
         const body = this.buildResultBody(result, articleText, articleTitle, articleId)
 
         if (result.reason === "completed") {
-            this.postResult(body, (data) => {
-                if (data.status === "saved") {
-                    this.saveSuccessTarget.classList.remove("hidden")
-                    if (data.achievements?.length > 0) this.showAchievements(data.achievements)
-                } else if (data.status === "skipped") {
-                    this.saveSkippedTarget.classList.remove("hidden")
-                } else {
-                    this.saveFailedTarget.classList.remove("hidden")
-                }
-            })
+            this.postResult(body, (data) => this.handleSaveResponse(data))
 
         } else if (result.reason === "ended") {
             // 途中終了時は保存ボタンを表示してユーザーの判断に委ねる
-            const isLoggedIn = document.querySelector('meta[name="user-signed-in"]')?.content === "true"
-
-            if (isLoggedIn) {
+            if (this.isSignedIn()) {
                 this.saveButtonTarget.classList.remove("hidden")
             } else {
                 this.postResult(body, (data) => {
@@ -78,7 +65,7 @@ export default class extends Controller {
     }
 
     postResult(body, onSuccess) {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content
+        const csrfToken = this.csrfToken()
         fetch("/typing/results", {
             method: "POST",
             headers: {
@@ -87,11 +74,46 @@ export default class extends Controller {
             },
             body: JSON.stringify(body)
         })
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) throw new Error("Failed to save typing result")
+            return res.json()
+        })
         .then(data => onSuccess(data))
         .catch(() => {
-            this.saveFailedTarget.classList.remove("hidden")
+            this.showSaveFailure()
         })
+    }
+
+    articleContext() {
+        return {
+            articleText: sessionStorage.getItem("typing_text"),
+            articleTitle: sessionStorage.getItem("article_title") || "",
+            articleId: sessionStorage.getItem("article_id") || null
+        }
+    }
+
+    isSignedIn() {
+        return document.querySelector('meta[name="user-signed-in"]')?.content === "true"
+    }
+
+    csrfToken() {
+        return document.querySelector('meta[name="csrf-token"]')?.content || ""
+    }
+
+    handleSaveResponse(data, { allowSkipped = true, hideSaveButton = false } = {}) {
+        if (data.status === "saved") {
+            this.saveSuccessTarget.classList.remove("hidden")
+            if (hideSaveButton) this.saveButtonTarget.classList.add("hidden")
+            if (data.achievements?.length > 0) this.showAchievements(data.achievements)
+        } else if (allowSkipped && data.status === "skipped") {
+            this.saveSkippedTarget.classList.remove("hidden")
+        } else {
+            this.showSaveFailure()
+        }
+    }
+
+    showSaveFailure() {
+        this.saveFailedTarget.classList.remove("hidden")
     }
 
     formatTime(seconds) {
@@ -198,21 +220,14 @@ export default class extends Controller {
 
     // 途中終了時に保存するかの選択で「保存する」を選んだ場合の処理
     saveManually() {
-        const articleText = sessionStorage.getItem("typing_text")
-        const articleTitle = sessionStorage.getItem("article_title") || ""
         const result = JSON.parse(sessionStorage.getItem("typing_result"))
-        const articleId = sessionStorage.getItem("article_id") || null
+        const { articleText, articleTitle, articleId } = this.articleContext()
         const body = this.buildResultBody(result, articleText, articleTitle, articleId)
 
-        this.postResult(body, (data) => {
-            if (data.status === "saved") {
-                this.saveSuccessTarget.classList.remove("hidden")
-                this.saveButtonTarget.classList.add("hidden")
-                if (data.achievements?.length > 0) this.showAchievements(data.achievements)
-            } else {
-                this.saveFailedTarget.classList.remove("hidden")
-            }
-        })
+        this.postResult(body, (data) => this.handleSaveResponse(data, {
+            allowSkipped: false,
+            hideSaveButton: true
+        }))
     }
 
     // sessionStorageの削除を行ってから、TOPページに遷移する
@@ -252,16 +267,17 @@ export default class extends Controller {
     }
 
     recordShareAchievement() {
-        const isLoggedIn = document.querySelector('meta[name="user-signed-in"]')?.content === "true"
-        if (!isLoggedIn) return
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content
+        if (!this.isSignedIn()) return
+
         fetch("/typing/results/share_achievement", {
             method: "POST",
-            headers: { "X-CSRF-Token": csrfToken }
+            headers: { "X-CSRF-Token": this.csrfToken() }
         }).catch(() => {})
     }
 
     showAchievements(achievements) {
+        if (!this.hasAchievementBannersTarget) return
+
         const container = this.achievementBannersTarget
         achievements.forEach((a, i) => {
             const el = document.createElement("div")
@@ -271,9 +287,10 @@ export default class extends Controller {
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
                     </svg>
-                    実績解除: ${a.name}
+                    実績解除: <span data-achievement-name></span>
                 </div>
             `
+            el.querySelector("[data-achievement-name]").textContent = a.name
             container.appendChild(el)
             // ステージング（順番に弾むように登場）
             setTimeout(() => {

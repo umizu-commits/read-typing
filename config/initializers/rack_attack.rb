@@ -1,20 +1,31 @@
-ARTICLE_FETCH_PATHS = %w[/articles /articles/fetch].freeze
+module ArticleRequestThrottle
+  FETCH_PATHS = %w[/articles /articles/fetch].freeze
+
+  module_function
+
+  def target_request?(request)
+    request.post? && FETCH_PATHS.include?(request.path)
+  end
+
+  def user_id(request)
+    # Devise が Warden セッションに保存するシリアライズ済みユーザーIDを読み取る。
+    request.session.dig("warden.user.user.key", 0, 0)
+  end
+end
 
 # 未ログイン
 Rack::Attack.throttle("articles/ip", limit: 5, period: 1.hour) do |req|
-  if ARTICLE_FETCH_PATHS.include?(req.path) && req.post?
-    # ログイン済みの場合は nil を返してカウント対象外にする
-    unless req.session["warden.user.user.key"]
-      req.env["action_dispatch.remote_ip"].to_s
-    end
-  end
+  next unless ArticleRequestThrottle.target_request?(req)
+  next if ArticleRequestThrottle.user_id(req)
+
+  req.env["action_dispatch.remote_ip"].to_s
 end
 
 # ログイン
 Rack::Attack.throttle("articles/user", limit: 10, period: 1.hour) do |req|
-  if ARTICLE_FETCH_PATHS.include?(req.path) && req.post?
-    req.session["warden.user.user.key"]&.first&.first
-  end
+  next unless ArticleRequestThrottle.target_request?(req)
+
+  ArticleRequestThrottle.user_id(req)
 end
 
 # 429レスポンスの設定

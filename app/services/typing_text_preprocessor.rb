@@ -43,10 +43,12 @@ class TypingTextPreprocessor
     # 空・短すぎるチェック
     return error_result("テキストが短すぎます") if text.length < MIN_BODY_LENGTH
 
-    # 上限で切り詰め、可能なら句点で丸める
-    truncated = text[0, MAX_BODY_LENGTH]
-    last_period = truncated.rindex("。")
-    text = last_period ? truncated[0, last_period + 1] : truncated
+    # 上限を超える場合は切り詰め、可能なら句点で丸める
+    if text.length > MAX_BODY_LENGTH
+      truncated = text[0, MAX_BODY_LENGTH]
+      last_period = truncated.rindex("。")
+      text = last_period ? truncated[0, last_period + 1] : truncated
+    end
 
     success_result(text)
   end

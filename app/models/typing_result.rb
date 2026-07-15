@@ -10,6 +10,7 @@ class TypingResult < ApplicationRecord
   validates :article_text, presence: true, length: { maximum: 10_000 }
   validates :article_title, length: { maximum: 255 }, allow_blank: true
   validate :article_must_belong_to_user
+  validate :correct_count_within_article_text_length
 
   scope :recent, -> { order(created_at: :desc) }
 
@@ -20,5 +21,12 @@ class TypingResult < ApplicationRecord
     return if article.present? && article.user_id == user_id
 
     errors.add(:article, "は自分が保存した記事を指定してください")
+  end
+
+  def correct_count_within_article_text_length
+    return if correct_count.blank? || article_text.blank?
+    return if correct_count.between?(0, article_text.length)
+
+    errors.add(:correct_count, "は本文の文字数以内で入力してください")
   end
 end
