@@ -87,3 +87,6 @@ gem "nokogiri"
 gem "ssrf_filter"
 
 gem "rack-attack"
+
+# Error monitoring for unhandled Rails exceptions in production.
+gem "sentry-rails"
