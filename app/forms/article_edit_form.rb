@@ -1,5 +1,6 @@
 class ArticleEditForm
   include ActiveModel::Model
+  include TagsAttachable
 
   attr_accessor :article, :title, :body, :category, :tag_names
 
@@ -38,7 +39,7 @@ class ArticleEditForm
   def attach_tags
     return if tag_names.nil?
 
-    names = tag_names.split(",").map(&:strip).reject(&:blank?).uniq
+    names = normalized_tag_names
     tags  = names.map { |name| Tag.find_or_create_by!(name: name) } # nil のときのみスキップ。空文字列は「タグを全削除」として処理する
     article.tags = tags
   end

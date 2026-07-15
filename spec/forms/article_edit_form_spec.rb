@@ -112,5 +112,14 @@ RSpec.describe ArticleEditForm do
         expect(article.tags.map(&:name)).to eq([ "既存タグ" ])
       end
     end
+
+    context "20文字を超えるタグ名を渡した場合" do
+      let(:params) { { body: "", tag_names: "a" * 21 } }
+
+      it "更新せずにタグ名のエラーを返す" do
+        expect(form.update).to be false
+        expect(form.errors[:tag_names]).to be_present
+      end
+    end
   end
 end

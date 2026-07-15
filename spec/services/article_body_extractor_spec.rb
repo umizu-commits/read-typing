@@ -82,5 +82,47 @@ RSpec.describe ArticleBodyExtractor do
         expect(result.title).to eq "記事タイトル"
       end
     end
+
+    context "本文抽出" do
+      it "本文要素だけを結合し不要な要素を除外する" do
+        html = <<~HTML
+          <html><body>
+            <article>
+              <header>ヘッダーは本文に含めない</header>
+              <h1>見出し</h1>
+              <p>これは十分な長さを持つ本文の一段落目です。テストのための文字列を追加します。</p>
+              <pre>コードブロックは本文に含めない</pre>
+              <ul><li>リスト項目</li></ul>
+              <footer>フッターは本文に含めない</footer>
+            </article>
+          </body></html>
+        HTML
+
+        result = described_class.new(html).call
+
+        expect(result).to be_success
+        expect(result.body).to eq(
+          "見出し\n\nこれは十分な長さを持つ本文の一段落目です。テストのための文字列を追加します。\n\nリスト項目"
+        )
+      end
+
+      it "本文要素がない場合はエラーを返す" do
+        html = "<html><body><article><div>本文ではない要素</div></article></body></html>"
+
+        result = described_class.new(html).call
+
+        expect(result).not_to be_success
+        expect(result.error_message).to eq("本文が見つかりませんでした")
+      end
+
+      it "本文が50文字未満の場合はエラーを返す" do
+        html = build_html(body: "a" * 49)
+
+        result = described_class.new(html).call
+
+        expect(result).not_to be_success
+        expect(result.error_message).to eq("本文が短すぎます")
+      end
+    end
   end
 end

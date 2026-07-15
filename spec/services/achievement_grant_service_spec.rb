@@ -9,6 +9,26 @@ RSpec.describe AchievementGrantService do
     service.call(context: context, typing_result: typing_result)
   end
 
+  def bulk_create_typing_results(count, attributes = {})
+    now = Time.current
+    rows = Array.new(count) do
+      {
+        user_id: user.id,
+        wpm: 50.0,
+        cpm: 50.0,
+        accuracy: 95.0,
+        miss_count: 0,
+        elapsed_time: 60,
+        article_text: "テスト用の記事本文です。",
+        correct_count: 0,
+        created_at: now,
+        updated_at: now
+      }.merge(attributes)
+    end
+
+    TypingResult.insert_all!(rows)
+  end
+
   describe "#call" do
     context "context: :typing_saved を渡した場合" do
       context "初回タイピングの場合" do
@@ -37,6 +57,36 @@ RSpec.describe AchievementGrantService do
 
         it "typing_10が付与されない" do
           expect(grant_keys(context: :typing_saved)).not_to include("typing_10")
+        end
+      end
+
+      [ [ 100, "typing_100" ], [ 1000, "typing_1000" ] ].each do |count, achievement_key|
+        context "タイピング回数が#{count}回の場合" do
+          before { bulk_create_typing_results(count) }
+
+          it "#{achievement_key}が付与される" do
+            expect(grant_keys(context: :typing_saved)).to include(achievement_key)
+          end
+        end
+      end
+
+      [ [ 10_000, "chars_10000" ], [ 100_000, "chars_100000" ] ].each do |correct_count, achievement_key|
+        context "累計正解文字数が#{correct_count}字の場合" do
+          before { create(:typing_result, user: user, correct_count: correct_count) }
+
+          it "#{achievement_key}が付与される" do
+            expect(grant_keys(context: :typing_saved)).to include(achievement_key)
+          end
+        end
+      end
+
+      [ [ 3600, "time_1hour" ], [ 36_000, "time_10hours" ] ].each do |elapsed_time, achievement_key|
+        context "累計練習時間が#{elapsed_time}秒の場合" do
+          before { create(:typing_result, user: user, elapsed_time: elapsed_time) }
+
+          it "#{achievement_key}が付与される" do
+            expect(grant_keys(context: :typing_saved)).to include(achievement_key)
+          end
         end
       end
 
@@ -136,6 +186,20 @@ RSpec.describe AchievementGrantService do
 
         it "first_typingは付与される" do
           expect(grant_keys(context: :typing_saved)).to include("first_typing")
+        end
+      end
+
+      [ [ 7, "streak_7" ], [ 30, "streak_30" ] ].each do |days, achievement_key|
+        context "#{days}日連続タイピングの場合" do
+          it "#{achievement_key}が付与される" do
+            travel_to(Time.zone.local(2026, 1, 30, 12, 0, 0)) do
+              days.times do |days_ago|
+                create(:typing_result, user: user, created_at: days_ago.days.ago)
+              end
+
+              expect(grant_keys(context: :typing_saved)).to include(achievement_key)
+            end
+          end
         end
       end
     end
