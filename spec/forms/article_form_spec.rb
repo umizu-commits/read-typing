@@ -125,5 +125,14 @@ RSpec.describe ArticleForm do
         expect(form.article.tags).to be_empty
       end
     end
+
+    context "20文字を超えるタグ名を渡した場合" do
+      let(:tag_names) { "a" * 21 }
+
+      it "保存せずにタグ名のエラーを返す" do
+        expect(form.save).to be false
+        expect(form.errors[:tag_names]).to be_present
+      end
+    end
   end
 end

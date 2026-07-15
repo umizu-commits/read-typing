@@ -63,6 +63,24 @@ RSpec.describe ArticleHtmlFetcher do
     end
   end
 
+  context "その他の4xxレスポンスの場合" do
+    before { stub_ssrf_get(build_response(code: 403)) }
+
+    it "アクセスエラー結果を返す" do
+      expect(result.success?).to be false
+      expect(result.error_message).to eq("ページにアクセスできませんでした")
+    end
+  end
+
+  context "5xxレスポンスの場合" do
+    before { stub_ssrf_get(build_response(code: 500)) }
+
+    it "サーバーエラー結果を返す" do
+      expect(result.success?).to be false
+      expect(result.error_message).to eq("サーバーエラーが発生しました")
+    end
+  end
+
   context "プライベートIPへのアクセスの場合" do
     before do
       allow(SsrfFilter).to receive(:get).and_raise(SsrfFilter::PrivateIPAddress)
@@ -100,6 +118,24 @@ RSpec.describe ArticleHtmlFetcher do
     it "エラー結果を返す" do
       expect(result.success?).to be false
       expect(result.error_message).to eq("応答が遅すぎます")
+    end
+  end
+
+  context "読み取りタイムアウトの場合" do
+    before { allow(SsrfFilter).to receive(:get).and_raise(Net::ReadTimeout) }
+
+    it "エラー結果を返す" do
+      expect(result.success?).to be false
+      expect(result.error_message).to eq("応答が遅すぎます")
+    end
+  end
+
+  context "SSL通信に失敗した場合" do
+    before { allow(SsrfFilter).to receive(:get).and_raise(OpenSSL::SSL::SSLError) }
+
+    it "エラー結果を返す" do
+      expect(result.success?).to be false
+      expect(result.error_message).to eq("SSL通信に失敗しました")
     end
   end
 end

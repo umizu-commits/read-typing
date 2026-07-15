@@ -18,6 +18,11 @@ RSpec.describe Article, type: :model do
         article = build(:article, user: nil)
         expect(article).to be_valid
       end
+
+      it "テキスト入力の記事はURLがなくても有効であること" do
+        article = build(:article, source_type: :text, url: nil)
+        expect(article).to be_valid
+      end
     end
 
     context "urlのバリデーション" do
@@ -50,6 +55,16 @@ RSpec.describe Article, type: :model do
       association = described_class.reflect_on_association(:user)
       expect(association.macro).to eq :belongs_to
       expect(association.options[:optional]).to eq true
+    end
+
+    it "記事を削除すると紐づくタイピング結果の記事IDをnilにする" do
+      user = create(:user)
+      article = create(:article, user: user)
+      typing_result = create(:typing_result, user: user, article: article)
+
+      article.destroy
+
+      expect(typing_result.reload.article).to be_nil
     end
   end
 

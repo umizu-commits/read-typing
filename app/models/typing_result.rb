@@ -9,6 +9,16 @@ class TypingResult < ApplicationRecord
   validates :elapsed_time, presence: true, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 86400 } # 24時間
   validates :article_text, presence: true, length: { maximum: 10_000 }
   validates :article_title, length: { maximum: 255 }, allow_blank: true
+  validate :article_must_belong_to_user
 
   scope :recent, -> { order(created_at: :desc) }
+
+  private
+
+  def article_must_belong_to_user
+    return if article_id.blank?
+    return if article.present? && article.user_id == user_id
+
+    errors.add(:article, "は自分が保存した記事を指定してください")
+  end
 end

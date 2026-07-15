@@ -72,6 +72,7 @@ class TypingHistoriesController < ApplicationController
     authorize @typing_result
 
     article = @typing_result.article
+    authorize article, :update? if article
     if article&.update(title: params.permit(:title)[:title])
       redirect_to typing_history_path(@typing_result), notice: "記事タイトルを更新しました"
     else

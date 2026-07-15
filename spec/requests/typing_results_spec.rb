@@ -33,6 +33,22 @@ RSpec.describe "タイピング結果保存", type: :request do
         expect(result.article_text).to eq "テスト用の記事テキストです。"
       end
 
+      it "自分の記事と正解文字数を紐づけて保存できる" do
+        article = create(:article, user: user)
+
+        post typing_results_path, params: valid_params.merge(
+          article_id: article.id,
+          article_title: "保存時タイトル",
+          correct_count: 42
+        )
+
+        result = TypingResult.last
+        expect(result.article).to eq article
+        expect(result.article_title).to eq "保存時タイトル"
+        expect(result.correct_count).to eq 42
+        expect(result.cpm).to eq 300.0
+      end
+
       it "ログインユーザーに紐づいて保存される" do
         post typing_results_path, params: valid_params
         expect(TypingResult.last.user).to eq user
@@ -53,6 +69,24 @@ RSpec.describe "タイピング結果保存", type: :request do
         }.not_to change(TypingResult, :count)
       end
 
+      it "他ユーザーの記事を紐づけた結果は保存されない" do
+        other_article = create(:article, user: create(:user))
+
+        expect {
+          post typing_results_path, params: valid_params.merge(article_id: other_article.id)
+        }.not_to change(TypingResult, :count)
+
+        expect(response.parsed_body["status"]).to eq "failed"
+      end
+
+      it "存在しない記事を紐づけた結果は保存されない" do
+        expect {
+          post typing_results_path, params: valid_params.merge(article_id: 0)
+        }.not_to change(TypingResult, :count)
+
+        expect(response.parsed_body["status"]).to eq "failed"
+      end
+
       it "レスポンスのstatusがfailedである" do
         post typing_results_path, params: valid_params.merge(wpm: nil)
         expect(response.parsed_body["status"]).to eq "failed"
@@ -70,6 +104,38 @@ RSpec.describe "タイピング結果保存", type: :request do
         post typing_results_path, params: valid_params
         expect(response.parsed_body["status"]).to eq "skipped"
       end
+
+      it "ログイン後に保存するため結果をセッションへ保持する" do
+        post typing_results_path, params: valid_params
+
+        expect(session[:pending_typing_result]).to include(
+          "wpm" => "60.0",
+          "cpm" => "300.0",
+          "article_text" => "テスト用の記事テキストです。"
+        )
+      end
+    end
+  end
+
+  describe "POST /typing/results/share_achievement" do
+    it "未ログインでは実績を付与しない" do
+      post "/typing/results/share_achievement"
+
+      expect(response.parsed_body["status"]).to eq "skipped"
+    end
+
+    it "ログイン中はSNS共有実績を一度だけ付与する" do
+      sign_in user
+
+      expect {
+        post "/typing/results/share_achievement"
+      }.to change(user.user_achievements, :count).by(1)
+      expect(response.parsed_body["status"]).to eq "ok"
+      expect(user.user_achievements.last.achievement_key).to eq "sns_share"
+
+      expect {
+        post "/typing/results/share_achievement"
+      }.not_to change(user.user_achievements, :count)
     end
   end
 end
