@@ -43,4 +43,10 @@ RSpec.describe User, type: :model do
       expect(user).not_to be_valid
     end
   end
+
+  describe "メール確認" do
+    it "Confirmableを有効にしている" do
+      expect(described_class.devise_modules).to include(:confirmable)
+    end
+  end
 end

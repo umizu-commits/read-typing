@@ -1,4 +1,4 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: "onboarding@resend.dev"
+  default from: Rails.configuration.x.mailer_sender
   layout "mailer"
 end

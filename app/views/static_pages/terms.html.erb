@@ -161,8 +161,7 @@
       <h2 class="text-base font-semibold text-gray-300 mb-2">第15条（お問い合わせ）</h2>
       <p>本サービスに関するお問い合わせは、以下の連絡先までお願いいたします。</p>
       <div class="mt-2 space-y-1">
-        <p>運営者：〇〇</p>
-        <p>メールアドレス：〇〇@example.com</p>
+        <p>メールアドレス：<%= mail_to Rails.configuration.x.contact_email %></p>
       </div>
     </section>
 

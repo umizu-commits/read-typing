@@ -22,6 +22,10 @@ module App
     # in config/environments, which are processed later.
     #
     config.time_zone = "Tokyo"
+    config.x.app_host = ENV.fetch("APP_HOST", "read-typing.com")
+    config.x.app_url = "https://#{config.x.app_host}"
+    config.x.mailer_sender = ENV.fetch("MAILER_SENDER", "noreply@#{config.x.app_host}")
+    config.x.contact_email = ENV.fetch("CONTACT_EMAIL", "support@#{config.x.app_host}")
     # config.eager_load_paths << Rails.root.join("extras")
 
     config.i18n.default_locale = :ja
