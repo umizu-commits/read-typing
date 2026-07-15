@@ -204,31 +204,4 @@ RSpec.describe "タイピング履歴", type: :request do
       end
     end
   end
-
-  describe "GET /typing/histories/chart_data" do
-    context "未ログインの場合" do
-      it "ログインページにリダイレクトされる" do
-        get chart_data_typing_histories_path
-
-        expect(response).to redirect_to(new_user_session_path)
-      end
-    end
-
-    context "ログイン済みの場合" do
-      before { sign_in user }
-
-      it "自分の結果だけを古い順にJSONで返す" do
-        create(:typing_result, user: user, cpm: 120.0, created_at: 2.hours.ago)
-        create(:typing_result, user: other_user, cpm: 999.0, created_at: 1.hour.ago)
-        create(:typing_result, user: user, cpm: 240.0, created_at: Time.current)
-
-        get chart_data_typing_histories_path
-
-        expect(response).to have_http_status(:success)
-        expect(response.parsed_body.size).to eq(1)
-        expect(response.parsed_body.first.fetch("name")).to eq("CPM")
-        expect(response.parsed_body.first.fetch("data").map(&:last)).to eq([ 120.0, 240.0 ])
-      end
-    end
-  end
 end

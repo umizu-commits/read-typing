@@ -16,31 +16,25 @@ class ArticleEditForm
   def update
     return false unless valid?
 
-    if body.present?
+    processed_body = if body.present?
       preprocess_result = TypingTextPreprocessor.new(body).call
       unless preprocess_result.success?
         errors.add(:base, preprocess_result.error_message)
         return false
       end
-      article.body = preprocess_result.body
+      preprocess_result.body
     end
 
-    article.title    = title.presence
-    article.category = category
-
-    return false unless article.save
-
-    attach_tags
+    Article.transaction do
+      article.body = processed_body if processed_body
+      article.title = title.presence
+      article.category = category
+      article.save!
+      attach_tags(article, clear_blank: true)
+    end
     true
-  end
-
-  private
-
-  def attach_tags
-    return if tag_names.nil?
-
-    names = normalized_tag_names
-    tags  = names.map { |name| Tag.find_or_create_by!(name: name) } # nil のときのみスキップ。空文字列は「タグを全削除」として処理する
-    article.tags = tags
+  rescue ActiveRecord::RecordInvalid => error
+    copy_record_errors(error.record)
+    false
   end
 end

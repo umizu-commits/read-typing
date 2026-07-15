@@ -7,11 +7,12 @@ CI.run do
 
   step "Security: Importmap vulnerability audit", "bin/importmap audit"
   step "Security: Brakeman code analysis", "bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error"
-  step "Tests: Rails", "bin/rails test"
-  step "Tests: RSpec", "bundle exec rspec"
+  step "Build: Tailwind CSS", "env RAILS_ENV=test bin/rails tailwindcss:build"
+  step "Tests: RSpec", "env RAILS_ENV=test bundle exec rspec"
   step "Tests: Seeds", "env RAILS_ENV=test bin/rails db:seed:replant"
 
-  step "Tests: System", "bin/rails test:system"
+  # System tests need a browser-enabled environment, so they run only when explicitly requested.
+  step "Tests: System", "env RAILS_ENV=test bin/rails test:system" if ENV["RUN_SYSTEM_TESTS"] == "true"
 
   # Optional: set a green GitHub commit status to unblock PR merge.
   # Requires the `gh` CLI and `gh extension install basecamp/gh-signoff`.

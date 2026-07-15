@@ -12,44 +12,20 @@ class ArticleForm
     return false unless valid?
 
     # 既存記事があれば外部フェッチをスキップして再利用する
-    existing = Article.find_by(url: url, user_id: user&.id)
-    if existing
-      @article = existing
-      attach_tags(@article)
-      return true
+    existing_article = Article.find_by(url: url, user_id: user&.id)
+    if existing_article
+      return persist_article_with_tags { @article = existing_article }
     end
 
-    fetch_result = ArticleHtmlFetcher.new(url).call
-    unless fetch_result.success?
-      errors.add(:base, fetch_result.error_message)
+    content_result = ArticleContentFetcher.new(url).call
+    unless content_result.success?
+      errors.add(:base, content_result.error_message)
       return false
     end
 
-    extract_result = ArticleBodyExtractor.new(fetch_result.html, url: url).call
-    unless extract_result.success?
-      errors.add(:base, extract_result.error_message)
-      return false
+    persist_article_with_tags do
+      @article = find_or_create_article(content_result)
     end
-
-    preprocess_result = TypingTextPreprocessor.new(extract_result.body).call
-    unless preprocess_result.success?
-      errors.add(:base, preprocess_result.error_message)
-      return false
-    end
-
-    # find_or_create_by! は SELECT→INSERT の2ステップのため、並行リクエスト時に
-    # 両方が INSERT を試みて一意制約違反になることがある。その場合は既存レコードを取得する。
-    begin
-      @article = Article.find_or_create_by!(url: url, user_id: user&.id) do |a|
-        a.body = preprocess_result.body
-        a.title = extract_result.title
-        a.category = category
-      end
-    rescue ActiveRecord::RecordNotUnique
-      @article = Article.find_by!(url: url, user_id: user&.id)
-    end
-    attach_tags(@article)
-    true
   end
 
   def article
@@ -57,6 +33,36 @@ class ArticleForm
   end
 
   private
+
+  def persist_article_with_tags
+    Article.transaction do
+      yield
+      attach_tags(@article)
+    end
+    true
+  rescue ActiveRecord::RecordInvalid => error
+    copy_record_errors(error.record)
+    false
+  end
+
+  def find_or_create_article(content_result)
+    # 一意制約違反をセーブポイント内で処理し、並行作成時は既存記事を再利用する。
+    begin
+      Article.transaction(requires_new: true) do
+        Article.find_or_create_by!(url: url, user_id: user&.id) do |article|
+          article.body = content_result.body
+          article.title = content_result.title
+          article.category = category
+        end
+      end
+    rescue ActiveRecord::RecordNotUnique
+      Article.find_by!(url: url, user_id: user&.id)
+    rescue ActiveRecord::RecordInvalid => error
+      raise unless uniqueness_conflict?(error.record, :url)
+
+      Article.find_by!(url: url, user_id: user&.id)
+    end
+  end
 
   def url_must_use_hostname
     return if url.blank? # presence バリデーションに任せる

@@ -8,7 +8,7 @@
     <p class="text-sm text-gray-400 mt-1">これまでの学習成果を確認して、スキルの向上を目指しましょう。</p>
   </div>
 
-  <% if @all_typing_results.empty? %>
+  <% unless @typing_history_summary.any_results? %>
     <%# 0件時は空状態を直接表示（タブは出さない） %>
     <div class="bg-gray-900 rounded-xl border border-gray-800 shadow-xl ring-1 ring-white/5 overflow-hidden">
       <div class="p-10 text-center">

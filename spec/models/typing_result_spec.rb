@@ -139,6 +139,24 @@ RSpec.describe TypingResult, type: :model do
       expect(typing_result).not_to be_valid
     end
 
+    it "correct_countが本文の文字数以下なら有効" do
+      typing_result = build(:typing_result, article_text: "a" * 50, correct_count: 50)
+
+      expect(typing_result).to be_valid
+    end
+
+    it "correct_countが本文の文字数を超えると無効" do
+      typing_result = build(:typing_result, article_text: "a" * 50, correct_count: 51)
+
+      expect(typing_result).not_to be_valid
+    end
+
+    it "correct_countが負の値だと無効" do
+      typing_result = build(:typing_result, correct_count: -1)
+
+      expect(typing_result).not_to be_valid
+    end
+
     it "article_titleが空文字なら有効" do
       typing_result = build(:typing_result, article_title: "")
       expect(typing_result).to be_valid

@@ -29,6 +29,26 @@ RSpec.describe ArticleHtmlFetcher do
     end
   end
 
+  context "URLの形式が不正な場合" do
+    let(:url) { "http://[::1" }
+
+    it "外部アクセスせずにエラー結果を返す" do
+      expect(SsrfFilter).not_to receive(:get)
+
+      expect(result).to have_attributes(success?: false, error_message: "アクセスできないURLです")
+    end
+  end
+
+  context "アクセス中にURI解析エラーが発生した場合" do
+    before do
+      allow(SsrfFilter).to receive(:get).and_raise(URI::InvalidURIError, "invalid URI")
+    end
+
+    it "エラー結果を返す" do
+      expect(result).to have_attributes(success?: false, error_message: "アクセスできないURLです")
+    end
+  end
+
   context "MAX_BODY_SIZEを超えるボディの場合" do
     before do
       large_response = instance_double(Net::HTTPResponse, code: "200").tap do |r|

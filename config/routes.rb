@@ -12,17 +12,12 @@ Rails.application.routes.draw do
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
-  # Defines the root path route ("/")
   get "/typing", to: "typing#show"
   get "/typing/result", to: "typing#result"
   post "/typing/results", to: "typing#save_result"
   post "/typing/results/share_achievement", to: "typing#record_share_achievement"
 
-  resources :typing_histories, only: [ :index, :show, :update ], path: "typing/histories" do
-    collection do
-      get :chart_data
-    end
-  end
+  resources :typing_histories, only: [ :index, :show, :update ], path: "typing/histories"
 
   resources :articles, only: [ :index, :create, :destroy, :edit, :update, :show ] do
     member do

@@ -41,6 +41,23 @@ class TypingFlowTest < ApplicationSystemTestCase
     assert_text "練習完了！お疲れ様でした。"
   end
 
+  test "再挑戦すると入力中の文字を初期化できる" do
+    visit root_path
+    page.execute_script("sessionStorage.setItem('typing_text', 'ab')")
+    visit typing_path
+
+    type_text("a", total: 2)
+    assert_equal "a", find("[data-typing-target='typedWindow']").text
+
+    click_button "再挑戦する"
+
+    assert_equal "", find("[data-typing-target='typedWindow']").text
+    assert_text "0/2文字"
+
+    type_text("a", "b", total: 2)
+    assert_current_path typing_result_path
+  end
+
   private
 
   def type_text(*keys, total:)

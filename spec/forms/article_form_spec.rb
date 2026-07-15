@@ -81,6 +81,19 @@ RSpec.describe ArticleForm do
       it "Articleが新規作成されない" do
         expect { form.save }.not_to change(Article, :count)
       end
+
+      context "tag_namesがblankの場合" do
+        let(:tag_names) { "" }
+        let!(:existing_tag) { Tag.create!(name: "既存タグ") }
+
+        before { existing_article.tags << existing_tag }
+
+        it "既存タグを変更しない" do
+          form.save
+
+          expect(existing_article.reload.tags.pluck(:name)).to eq([ "既存タグ" ])
+        end
+      end
     end
 
     context "新規URLの場合" do
@@ -90,6 +103,25 @@ RSpec.describe ArticleForm do
 
       it "Articleが1件作成される" do
         expect { form.save }.to change(Article, :count).by(1)
+      end
+    end
+
+    context "記事作成が他リクエストと競合した場合" do
+      let!(:existing_article) { create(:article, url: url, user: user) }
+
+      before do
+        conflicting_article = Article.new(url: url, body: "a" * 50)
+        conflicting_article.errors.add(:url, :taken)
+        allow(Article).to receive(:find_by).with(url: url, user_id: user.id).and_return(nil)
+        allow(Article).to receive(:find_by!).with(url: url, user_id: user.id).and_return(existing_article)
+        allow(Article).to receive(:find_or_create_by!).with(url: url, user_id: user.id).and_raise(
+          ActiveRecord::RecordInvalid.new(conflicting_article)
+        )
+      end
+
+      it "既に作成された記事を再利用する" do
+        expect(form.save).to be true
+        expect(form.article).to eq(existing_article)
       end
     end
 

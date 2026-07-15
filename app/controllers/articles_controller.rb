@@ -28,11 +28,13 @@ class ArticlesController < ApplicationController
     @current_favorites_only = params[:favorites_only] == "true"
     articles = articles.merge(current_user.favorite_articles) if @current_favorites_only
     articles = articles.sorted_by(params[:sort].presence || "newest")
-    @articles = articles.includes(:tags, :favorites).page(params[:page]).per(20)
+    @articles = articles.includes(:tags).page(params[:page]).per(20)
     @current_sort = params[:sort].presence || "newest"
     @current_keyword = params[:q].to_s.strip
     @current_category = params[:category].to_s
     @current_tag = params[:tag].to_s
+    @available_tag_names = policy_scope(Article).joins(:tags).distinct.pluck("tags.name").sort
+    @favorited_article_ids = current_user.favorites.where(article_id: @articles.select(:id)).pluck(:article_id)
   end
 
   def show

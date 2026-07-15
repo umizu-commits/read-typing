@@ -1,32 +1,14 @@
 class AchievementGrantService
-  TYPING_CHECKS = %w[
-    first_typing
-    typing_10 typing_100 typing_1000
-    chars_10000 chars_100000
-    time_1hour time_10hours
-    cpm_100 cpm_200 cpm_300
-    accuracy_100
-    streak_3 streak_7 streak_30
-  ].freeze
-
   def initialize(user)
     @user = user
     @granted_keys = user.user_achievements.pluck(:achievement_key).to_set
   end
 
   def call(context:, typing_result: nil)
-    keys = case context
-    when :typing_saved  then TYPING_CHECKS
-    when :article_saved then %w[first_article]
-    when :sns_shared    then %w[sns_share]
-    else []
-    end
-
-    keys.filter_map do |key|
+    Achievement.keys_for(context).filter_map do |key|
       next if @granted_keys.include?(key)
       next unless condition_met?(key, typing_result)
-      grant!(key)
-      key
+      key if grant!(key)
     end
   end
 
@@ -58,6 +40,14 @@ class AchievementGrantService
   def grant!(key)
     @user.user_achievements.create!(achievement_key: key, achieved_at: Time.current)
     @granted_keys.add(key)
+    true
+  rescue ActiveRecord::RecordNotUnique
+    false
+  rescue ActiveRecord::RecordInvalid
+    # モデルの一意性検証で先に検出される競合も、重複付与ではなく未付与として扱う。
+    return false if @user.user_achievements.exists?(achievement_key: key)
+
+    raise
   end
 
   def typing_count
@@ -85,7 +75,7 @@ class AchievementGrantService
                  .reverse
 
     return 0 if dates.empty?
-    return 0 if dates.first < Date.today - 1.day # 最後の練習日が昨日より前ならストリーク途切れ
+    return 0 if dates.first < Date.current - 1.day # 最後の練習日が昨日より前ならストリーク途切れ
 
     streak = 1
     dates.each_cons(2) do |later, earlier|

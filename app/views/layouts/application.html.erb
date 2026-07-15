@@ -30,74 +30,7 @@
   </head>
 
   <body data-controller="help" class="bg-gray-950 min-w-[1280px] min-h-screen flex flex-col">
-    <header class="relative w-full bg-gray-900 border-b border-gray-800" data-controller="menu">
-      <div class="w-full px-20 h-14 flex items-center justify-between">
-        <%= link_to "ReadTyping", root_path, class: "text-green-500 font-bold text-lg font-mono" %>
-
-        <div class="flex items-center gap-1">
-          <%# ハンバーガーボタン %>
-          <button type="button"
-                  data-action="click->menu#toggle"
-                  class="text-gray-300 hover:text-gray-100 p-2 rounded-lg hover:bg-gray-800 transition-colors">
-            <svg data-menu-target="openIcon" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-            <svg data-menu-target="closeIcon" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-
-          <%# ヘルプ ? ボタン（直接アクセス用） %>
-          <button type="button"
-                  data-action="click->help#open"
-                  title="ヘルプを開く"
-                  class="text-gray-300 hover:text-gray-100 p-2 rounded-lg hover:bg-gray-800 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
-            </svg>
-          </button>
-
-          <%# ログイン中アイコン %>
-          <% if user_signed_in? %>
-            <span class="text-green-500 p-2" title="ログイン中">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A8.966 8.966 0 0112 15c2.21 0 4.232.797 5.879 2.11M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </span>
-          <% end %>
-        </div>
-      </div>
-
-      <%# ドロップダウンメニュー %>
-      <div data-menu-target="panel"
-           class="hidden absolute right-0 top-14 w-52 bg-gray-900 border border-gray-800 rounded-bl-xl shadow-2xl z-50 py-2">
-
-        <%# ヘルプ %>
-        <button type="button" data-action="click->help#open"
-                class="w-full flex items-center px-5 py-3 text-sm text-gray-300 hover:bg-gray-800 hover:text-gray-100 transition-colors">
-          ヘルプ
-        </button>
-
-        <% if user_signed_in? %>
-          <div class="border-t border-gray-800 my-1"></div>
-          <%= link_to "保存記事", articles_path,
-                class: "flex items-center px-5 py-3 text-sm text-gray-300 hover:bg-gray-800 hover:text-gray-100 transition-colors" %>
-          <%= link_to "履歴一覧", typing_histories_path(tab: :summary),
-                class: "flex items-center px-5 py-3 text-sm text-gray-300 hover:bg-gray-800 hover:text-gray-100 transition-colors" %>
-          <div class="border-t border-gray-800 my-1"></div>
-          <%= link_to "ログアウト", destroy_user_session_path, data: { turbo_method: :delete },
-                class: "flex items-center px-5 py-3 text-sm text-gray-300 hover:bg-gray-800 hover:text-gray-100 transition-colors" %>
-          <%= link_to "退会", cancel_user_registration_path,
-                class: "flex items-center px-5 py-3 text-sm text-gray-300 hover:bg-gray-800 hover:text-gray-100 transition-colors" %>
-        <% else %>
-          <div class="border-t border-gray-800 my-1"></div>
-          <%= link_to "新規登録", new_user_registration_path,
-                class: "flex items-center px-5 py-3 text-sm text-gray-300 hover:bg-gray-800 hover:text-gray-100 transition-colors" %>
-          <%= link_to "ログイン", new_user_session_path,
-                class: "flex items-center px-5 py-3 text-sm text-gray-300 hover:bg-gray-800 hover:text-gray-100 transition-colors" %>
-        <% end %>
-      </div>
-    </header>
+    <%= render "shared/header" %>
     <main class="flex-1 flex flex-col container mx-auto px-5">
 
       <!-- ログイン系のフラッシュメッセージ -->
@@ -117,37 +50,7 @@
         </div>
       </footer>
     <% end %>
-    <%# 確認モーダル（自作 turbo confirm） %>
-    <div data-controller="confirm-modal"
-         data-action="click->confirm-modal#backdropClick keydown@window->confirm-modal#keydown"
-         class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div data-confirm-modal-target="panel"
-           class="bg-gray-900 border border-gray-800 rounded-xl shadow-xl ring-1 ring-white/5 p-6 w-[420px] transition-all duration-150 opacity-0 scale-95">
-        <div class="flex items-start gap-3 mb-5">
-          <div class="w-10 h-10 rounded-full bg-red-950 flex items-center justify-center shrink-0">
-            <svg class="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-          </div>
-          <div class="flex-1">
-            <h2 class="text-base font-bold text-gray-100 mb-1">確認</h2>
-            <p data-confirm-modal-target="message" class="text-sm text-gray-400 leading-relaxed"></p>
-          </div>
-        </div>
-        <div class="flex justify-end gap-2">
-          <button type="button"
-                  data-action="click->confirm-modal#cancel"
-                  class="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 text-sm font-bold transition-colors">
-            キャンセル
-          </button>
-          <button type="button"
-                  data-action="click->confirm-modal#confirm"
-                  class="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm font-bold transition-colors">
-            実行する
-          </button>
-        </div>
-      </div>
-    </div>
+    <%= render "shared/confirm_modal" %>
 
     <%# モーダル ヘルプ用 %>
     <div data-help-target="modal" data-controller="tabs"

@@ -121,5 +121,41 @@ RSpec.describe ArticleEditForm do
         expect(form.errors[:tag_names]).to be_present
       end
     end
+
+    context "タグ作成が他リクエストと競合した場合" do
+      let(:params) { { body: "", tag_names: "Rails" } }
+      let!(:tag) { Tag.create!(name: "Rails") }
+
+      before do
+        conflicting_tag = Tag.new(name: "Rails")
+        conflicting_tag.valid?
+        allow(Tag).to receive(:find_or_create_by!).with(name: "Rails").and_raise(
+          ActiveRecord::RecordInvalid.new(conflicting_tag)
+        )
+        allow(Tag).to receive(:find_by!).with(name: "Rails").and_return(tag)
+      end
+
+      it "既に作成されたタグを紐づけて更新する" do
+        expect(form.update).to be true
+        expect(article.reload.tags).to contain_exactly(tag)
+      end
+    end
+
+    context "タグの保存に失敗した場合" do
+      let(:params) { { title: "更新後", body: "", tag_names: "Rails" } }
+
+      before do
+        invalid_tag = Tag.new(name: "")
+        invalid_tag.valid?
+        allow(Tag).to receive(:find_or_create_by!).with(name: "Rails").and_raise(ActiveRecord::RecordInvalid.new(invalid_tag))
+      end
+
+      it "記事本文の更新をロールバックする" do
+        original_title = article.title
+
+        expect(form.update).to be false
+        expect(article.reload.title).to eq(original_title)
+      end
+    end
   end
 end
