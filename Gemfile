@@ -69,7 +69,7 @@ gem "pundit", "~> 2.5"
 
 gem "rspec-rails", "~> 8.0", groups: [ :development, :test ]
 
-gem "rubocop", "~> 1.86", groups: [ :development, :test ]
+gem "rubocop", "~> 1.89", groups: [ :development, :test ]
 gem "rubocop-rails", "~> 2.35", groups: [ :development, :test ]
 
 gem "tailwindcss-rails", "~> 4.4"
